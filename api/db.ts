@@ -186,6 +186,39 @@ export interface RepairOrder {
   updatedAt: string
 }
 
+export type InventoryCategory = 'flower' | 'decoration'
+export type InventoryOperationType = 'in' | 'out' | 'loss'
+
+export interface InventoryItem {
+  id: number
+  name: string
+  category: InventoryCategory
+  unit: string
+  stock: number
+  safetyStock: number
+  unitPrice: number
+  totalValue: number
+  supplier: string
+  remark: string
+  status: 'active' | 'inactive'
+  createdAt: string
+  updatedAt: string
+}
+
+export interface InventoryRecord {
+  id: number
+  itemId: number
+  operationType: InventoryOperationType
+  quantity: number
+  unitPrice: number
+  totalPrice: number
+  operator: string
+  operationDate: string
+  orderNo?: string
+  remark: string
+  createdAt: string
+}
+
 export interface Database {
   drivers: Driver[]
   vehicles: Vehicle[]
@@ -198,6 +231,8 @@ export interface Database {
   flowerPackages: FlowerPackage[]
   carDecorations: CarDecoration[]
   repairOrders: RepairOrder[]
+  inventoryItems: InventoryItem[]
+  inventoryRecords: InventoryRecord[]
 }
 
 function readDB(): Database {

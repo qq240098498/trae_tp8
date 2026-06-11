@@ -10,6 +10,7 @@ import FlowerPackages from "@/pages/FlowerPackages";
 import CarDecorations from "@/pages/CarDecorations";
 import Settlements from "@/pages/Settlements";
 import Statistics from "@/pages/Statistics";
+import Inventory from "@/pages/Inventory";
 
 export default function App() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
           <Route path="/orders" element={<Orders />} />
           <Route path="/flower-packages" element={<FlowerPackages />} />
           <Route path="/car-decorations" element={<CarDecorations />} />
+          <Route path="/inventory" element={<Inventory />} />
           <Route path="/settlements" element={<Settlements />} />
           <Route path="/statistics" element={<Statistics />} />
         </Route>

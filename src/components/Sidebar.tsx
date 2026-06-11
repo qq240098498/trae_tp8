@@ -10,6 +10,7 @@ import {
   BookOpen,
   Sparkles,
   Wrench,
+  Package,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -22,6 +23,7 @@ const menuItems = [
   { path: '/orders', label: '订单管理', icon: Calendar },
   { path: '/flower-packages', label: '鲜花套餐', icon: Flower2 },
   { path: '/car-decorations', label: '婚车装饰', icon: Sparkles },
+  { path: '/inventory', label: '物料库存', icon: Package },
   { path: '/settlements', label: '结算管理', icon: DollarSign },
   { path: '/statistics', label: '统计分析', icon: BarChart3 },
 ]

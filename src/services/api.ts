@@ -367,4 +367,102 @@ export const api = {
         method: 'PATCH',
       }),
   },
+
+  inventory: {
+    overview: () =>
+      request<{
+        totalItems: number
+        activeItems: number
+        lowStockItems: number
+        totalValue: number
+        flowerCount: number
+        decorationCount: number
+        flowerValue: number
+        decorationValue: number
+        todayIn: number
+        todayOut: number
+        todayLoss: number
+      }>('/inventory/overview'),
+
+    listItems: (params?: {
+      category?: string
+      status?: string
+      keyword?: string
+      lowStock?: boolean
+    }) => {
+      const query = new URLSearchParams()
+      if (params?.category) query.set('category', params.category)
+      if (params?.status) query.set('status', params.status)
+      if (params?.keyword) query.set('keyword', params.keyword)
+      if (params?.lowStock) query.set('lowStock', 'true')
+      return request<import('@/types').InventoryItem[]>(
+        `/inventory/items?${query.toString()}`,
+      )
+    },
+    getItem: (id: number) =>
+      request<import('@/types').InventoryItem>(`/inventory/items/${id}`),
+    createItem: (data: Partial<import('@/types').InventoryItem>) =>
+      request<import('@/types').InventoryItem>('/inventory/items', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    updateItem: (id: number, data: Partial<import('@/types').InventoryItem>) =>
+      request<import('@/types').InventoryItem>(`/inventory/items/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      }),
+    updateItemStatus: (id: number, status: 'active' | 'inactive') =>
+      request<import('@/types').InventoryItem>(`/inventory/items/${id}/status`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status }),
+      }),
+    deleteItem: (id: number) =>
+      request<{ message: string }>(`/inventory/items/${id}`, {
+        method: 'DELETE',
+      }),
+
+    listRecords: (params?: {
+      operationType?: string
+      itemId?: string | number
+      dateFrom?: string
+      dateTo?: string
+      keyword?: string
+    }) => {
+      const query = new URLSearchParams()
+      if (params?.operationType) query.set('operationType', params.operationType)
+      if (params?.itemId) query.set('itemId', String(params.itemId))
+      if (params?.dateFrom) query.set('dateFrom', params.dateFrom)
+      if (params?.dateTo) query.set('dateTo', params.dateTo)
+      if (params?.keyword) query.set('keyword', params.keyword)
+      return request<import('@/types').InventoryRecord[]>(
+        `/inventory/records?${query.toString()}`,
+      )
+    },
+    createRecord: (
+      data: Partial<import('@/types').InventoryRecord> & { operator: string },
+    ) =>
+      request<{
+        data: import('@/types').InventoryRecord
+        item: import('@/types').InventoryItem
+      }>('/inventory/records', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+
+    lossStats: (params?: { category?: string; dateFrom?: string; dateTo?: string }) => {
+      const query = new URLSearchParams()
+      if (params?.category) query.set('category', params.category)
+      if (params?.dateFrom) query.set('dateFrom', params.dateFrom)
+      if (params?.dateTo) query.set('dateTo', params.dateTo)
+      return request<{
+        list: import('@/types').InventoryLossStats[]
+        summary: {
+          totalLossQuantity: number
+          totalLossValue: number
+          totalItems: number
+          highLossItems: number
+        }
+      }>(`/inventory/loss-stats?${query.toString()}`)
+    },
+  },
 }

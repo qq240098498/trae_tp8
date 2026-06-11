@@ -18,6 +18,9 @@ import type {
   FlowerPackage,
   CarDecoration,
   RepairOrder,
+  InventoryItem,
+  InventoryRecord,
+  InventoryLossStats,
 } from '@/types'
 import { api } from '@/services/api'
 
@@ -32,6 +35,30 @@ interface AppState {
   flowerPackages: FlowerPackage[]
   carDecorations: CarDecoration[]
   repairOrders: RepairOrder[]
+  inventoryItems: InventoryItem[]
+  inventoryRecords: InventoryRecord[]
+  inventoryOverview: {
+    totalItems: number
+    activeItems: number
+    lowStockItems: number
+    totalValue: number
+    flowerCount: number
+    decorationCount: number
+    flowerValue: number
+    decorationValue: number
+    todayIn: number
+    todayOut: number
+    todayLoss: number
+  } | null
+  inventoryLossStats: {
+    list: InventoryLossStats[]
+    summary: {
+      totalLossQuantity: number
+      totalLossValue: number
+      totalItems: number
+      highLossItems: number
+    }
+  } | null
   stats: {
     overview: StatsOverview | null
     monthlyData: MonthlyData[]
@@ -54,6 +81,10 @@ interface AppState {
   fetchFlowerPackages: (params?: { status?: string; keyword?: string }) => Promise<void>
   fetchCarDecorations: (params?: { status?: string; decorationType?: string; keyword?: string }) => Promise<void>
   fetchRepairOrders: (params?: { vehicleId?: string | number; status?: string; keyword?: string }) => Promise<void>
+  fetchInventoryOverview: () => Promise<void>
+  fetchInventoryItems: (params?: { category?: string; status?: string; keyword?: string; lowStock?: boolean }) => Promise<void>
+  fetchInventoryRecords: (params?: { operationType?: string; itemId?: string | number; dateFrom?: string; dateTo?: string; keyword?: string }) => Promise<void>
+  fetchInventoryLossStats: (params?: { category?: string; dateFrom?: string; dateTo?: string }) => Promise<void>
   fetchStatsOverview: () => Promise<void>
   fetchStatsMonthly: () => Promise<void>
   fetchStatsStatus: () => Promise<void>
@@ -99,6 +130,14 @@ interface AppState {
   completeRepairOrder: (id: number, data?: { actualCost?: number; completeDate?: string; repairItems?: string; remark?: string }) => Promise<RepairOrder>
   cancelRepairOrder: (id: number) => Promise<RepairOrder>
 
+  addInventoryItem: (data: Partial<InventoryItem>) => Promise<InventoryItem>
+  updateInventoryItem: (id: number, data: Partial<InventoryItem>) => Promise<InventoryItem>
+  deleteInventoryItem: (id: number) => Promise<void>
+  updateInventoryItemStatus: (id: number, status: 'active' | 'inactive') => Promise<InventoryItem>
+  addInventoryRecord: (
+    data: Partial<InventoryRecord> & { operator: string },
+  ) => Promise<{ record: InventoryRecord; item: InventoryItem }>
+
   addOrder: (data: Partial<Order> & { vehicles?: Array<Partial<import('@/types').OrderVehicle>> }) => Promise<Order>
   updateOrder: (
     id: number,
@@ -125,6 +164,10 @@ export const useAppStore = create<AppState>((set) => ({
   flowerPackages: [],
   carDecorations: [],
   repairOrders: [],
+  inventoryItems: [],
+  inventoryRecords: [],
+  inventoryOverview: null,
+  inventoryLossStats: null,
   stats: {
     overview: null,
     monthlyData: [],
@@ -585,6 +628,94 @@ export const useAppStore = create<AppState>((set) => ({
       repairOrders: state.repairOrders.map((o) => (o.id === id ? order : o)),
     }))
     return order
+  },
+
+  fetchInventoryOverview: async () => {
+    set({ loading: true, error: null })
+    try {
+      const data = await api.inventory.overview()
+      set({ inventoryOverview: data })
+    } catch (err) {
+      set({ error: (err as Error).message })
+    } finally {
+      set({ loading: false })
+    }
+  },
+
+  fetchInventoryItems: async (params) => {
+    set({ loading: true, error: null })
+    try {
+      const data = await api.inventory.listItems(params)
+      set({ inventoryItems: data })
+    } catch (err) {
+      set({ error: (err as Error).message })
+    } finally {
+      set({ loading: false })
+    }
+  },
+
+  fetchInventoryRecords: async (params) => {
+    set({ loading: true, error: null })
+    try {
+      const data = await api.inventory.listRecords(params)
+      set({ inventoryRecords: data })
+    } catch (err) {
+      set({ error: (err as Error).message })
+    } finally {
+      set({ loading: false })
+    }
+  },
+
+  fetchInventoryLossStats: async (params) => {
+    set({ loading: true, error: null })
+    try {
+      const data = await api.inventory.lossStats(params)
+      set({ inventoryLossStats: data })
+    } catch (err) {
+      set({ error: (err as Error).message })
+    } finally {
+      set({ loading: false })
+    }
+  },
+
+  addInventoryItem: async (data) => {
+    const item = await api.inventory.createItem(data)
+    set((state) => ({ inventoryItems: [...state.inventoryItems, item] }))
+    return item
+  },
+
+  updateInventoryItem: async (id, data) => {
+    const item = await api.inventory.updateItem(id, data)
+    set((state) => ({
+      inventoryItems: state.inventoryItems.map((i) => (i.id === id ? item : i)),
+    }))
+    return item
+  },
+
+  deleteInventoryItem: async (id) => {
+    await api.inventory.deleteItem(id)
+    set((state) => ({
+      inventoryItems: state.inventoryItems.filter((i) => i.id !== id),
+    }))
+  },
+
+  updateInventoryItemStatus: async (id, status) => {
+    const item = await api.inventory.updateItemStatus(id, status)
+    set((state) => ({
+      inventoryItems: state.inventoryItems.map((i) => (i.id === id ? item : i)),
+    }))
+    return item
+  },
+
+  addInventoryRecord: async (data) => {
+    const result = await api.inventory.createRecord(data)
+    set((state) => ({
+      inventoryRecords: [result.data, ...state.inventoryRecords],
+      inventoryItems: state.inventoryItems.map((i) =>
+        i.id === result.item.id ? result.item : i,
+      ),
+    }))
+    return { record: result.data, item: result.item }
   },
 
   addOrder: async (data) => {

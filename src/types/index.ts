@@ -371,3 +371,74 @@ export const REPAIR_STATUS_OPTIONS = [
   { value: 'completed', label: '已完成' },
   { value: 'cancelled', label: '已取消' },
 ]
+
+export type InventoryCategory = 'flower' | 'decoration'
+export type InventoryOperationType = 'in' | 'out' | 'loss'
+
+export interface InventoryItem {
+  id: number
+  name: string
+  category: InventoryCategory
+  unit: string
+  stock: number
+  safetyStock: number
+  unitPrice: number
+  totalValue: number
+  supplier: string
+  remark: string
+  status: 'active' | 'inactive'
+  createdAt: string
+  updatedAt: string
+}
+
+export interface InventoryRecord {
+  id: number
+  itemId: number
+  itemName?: string
+  operationType: InventoryOperationType
+  quantity: number
+  unitPrice: number
+  totalPrice: number
+  operator: string
+  operationDate: string
+  orderNo?: string
+  remark: string
+  createdAt: string
+}
+
+export interface InventoryLossStats {
+  itemId: number
+  itemName: string
+  category: InventoryCategory
+  lossQuantity: number
+  lossValue: number
+  totalInQuantity: number
+  lossRate: number
+}
+
+export const INVENTORY_CATEGORY_MAP: Record<InventoryCategory, { label: string; color: string }> = {
+  flower: { label: '鲜花类', color: 'bg-pink-100 text-pink-800' },
+  decoration: { label: '装饰用品类', color: 'bg-purple-100 text-purple-800' },
+}
+
+export const INVENTORY_CATEGORY_OPTIONS = [
+  { value: 'flower', label: '鲜花类' },
+  { value: 'decoration', label: '装饰用品类' },
+]
+
+export const INVENTORY_OPERATION_TYPE_MAP: Record<InventoryOperationType, { label: string; color: string }> = {
+  in: { label: '入库', color: 'bg-green-100 text-green-800' },
+  out: { label: '出库', color: 'bg-blue-100 text-blue-800' },
+  loss: { label: '损耗', color: 'bg-red-100 text-red-800' },
+}
+
+export const INVENTORY_OPERATION_TYPE_OPTIONS = [
+  { value: 'in', label: '入库' },
+  { value: 'out', label: '出库' },
+  { value: 'loss', label: '损耗' },
+]
+
+export const INVENTORY_STATUS_MAP: Record<string, { label: string; color: string }> = {
+  active: { label: '启用', color: 'bg-green-100 text-green-800' },
+  inactive: { label: '停用', color: 'bg-gray-100 text-gray-800' },
+}
