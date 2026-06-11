@@ -81,11 +81,21 @@ router.get('/:id', (req: Request, res: Response): void => {
     }
   })
 
+  const flowerPackages = (order.flowerPackageIds || []).map((pid: number) =>
+    database.flowerPackages.find(fp => fp.id === pid)
+  ).filter(Boolean)
+
+  const carDecorations = (order.carDecorationIds || []).map((did: number) =>
+    database.carDecorations.find(cd => cd.id === did)
+  ).filter(Boolean)
+
   res.json({
     success: true,
     data: {
       ...order,
       vehicles: vehiclesWithDetails,
+      flowerPackages,
+      carDecorations,
     },
   })
 })
@@ -265,6 +275,8 @@ router.post('/', (req: Request, res: Response): void => {
     status: body.status || 'pending',
     totalAmount: body.totalAmount || 0,
     depositAmount: body.depositAmount || 0,
+    flowerPackageIds: body.flowerPackageIds || [],
+    carDecorationIds: body.carDecorationIds || [],
     remark: body.remark || '',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),

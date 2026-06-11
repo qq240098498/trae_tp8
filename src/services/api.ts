@@ -265,4 +265,63 @@ export const api = {
         method: 'DELETE',
       }),
   },
+
+  flowerPackages: {
+    list: (params?: { status?: string; keyword?: string }) => {
+      const query = new URLSearchParams()
+      if (params?.status) query.set('status', params.status)
+      if (params?.keyword) query.set('keyword', params.keyword)
+      return request<import('@/types').FlowerPackage[]>(`/flower-packages?${query.toString()}`)
+    },
+    get: (id: number) => request<import('@/types').FlowerPackage>(`/flower-packages/${id}`),
+    create: (data: Partial<import('@/types').FlowerPackage>) =>
+      request<import('@/types').FlowerPackage>('/flower-packages', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    update: (id: number, data: Partial<import('@/types').FlowerPackage>) =>
+      request<import('@/types').FlowerPackage>(`/flower-packages/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      }),
+    remove: (id: number) =>
+      request<{ message: string }>(`/flower-packages/${id}`, {
+        method: 'DELETE',
+      }),
+    updateStatus: (id: number, status: string) =>
+      request<import('@/types').FlowerPackage>(`/flower-packages/${id}/status`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status }),
+      }),
+  },
+
+  carDecorations: {
+    list: (params?: { status?: string; decorationType?: string; keyword?: string }) => {
+      const query = new URLSearchParams()
+      if (params?.status) query.set('status', params.status)
+      if (params?.decorationType) query.set('decorationType', params.decorationType)
+      if (params?.keyword) query.set('keyword', params.keyword)
+      return request<import('@/types').CarDecoration[]>(`/car-decorations?${query.toString()}`)
+    },
+    get: (id: number) => request<import('@/types').CarDecoration>(`/car-decorations/${id}`),
+    create: (data: Partial<import('@/types').CarDecoration>) =>
+      request<import('@/types').CarDecoration>('/car-decorations', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    update: (id: number, data: Partial<import('@/types').CarDecoration>) =>
+      request<import('@/types').CarDecoration>(`/car-decorations/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      }),
+    remove: (id: number) =>
+      request<{ message: string }>(`/car-decorations/${id}`, {
+        method: 'DELETE',
+      }),
+    updateStatus: (id: number, status: string) =>
+      request<import('@/types').CarDecoration>(`/car-decorations/${id}/status`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status }),
+      }),
+  },
 }

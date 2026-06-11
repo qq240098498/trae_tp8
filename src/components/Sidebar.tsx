@@ -8,6 +8,7 @@ import {
   BarChart3,
   Flower2,
   BookOpen,
+  Sparkles,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -17,6 +18,8 @@ const menuItems = [
   { path: '/vehicles', label: '车辆管理', icon: Car },
   { path: '/vehicle-ledger', label: '车辆台账', icon: BookOpen },
   { path: '/orders', label: '订单管理', icon: Calendar },
+  { path: '/flower-packages', label: '鲜花套餐', icon: Flower2 },
+  { path: '/car-decorations', label: '婚车装饰', icon: Sparkles },
   { path: '/settlements', label: '结算管理', icon: DollarSign },
   { path: '/statistics', label: '统计分析', icon: BarChart3 },
 ]

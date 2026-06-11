@@ -52,6 +52,8 @@ export interface Order {
   status: 'pending' | 'scheduled' | 'departed' | 'returned' | 'settled' | 'cancelled'
   totalAmount: number
   depositAmount: number
+  flowerPackageIds: number[]
+  carDecorationIds: number[]
   remark: string
   createdAt: string
   updatedAt: string
@@ -129,6 +131,33 @@ export interface InspectionRecord {
   updatedAt: string
 }
 
+export interface FlowerPackage {
+  id: number
+  name: string
+  description: string
+  price: number
+  items: string
+  imageUrl: string
+  status: 'active' | 'inactive'
+  remark: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CarDecoration {
+  id: number
+  name: string
+  decorationType: string
+  description: string
+  price: number
+  applicableVehicleTypes: string
+  imageUrl: string
+  status: 'active' | 'inactive'
+  remark: string
+  createdAt: string
+  updatedAt: string
+}
+
 export interface Database {
   drivers: Driver[]
   vehicles: Vehicle[]
@@ -138,6 +167,8 @@ export interface Database {
   maintenanceRecords: MaintenanceRecord[]
   insuranceRecords: InsuranceRecord[]
   inspectionRecords: InspectionRecord[]
+  flowerPackages: FlowerPackage[]
+  carDecorations: CarDecoration[]
 }
 
 function readDB(): Database {

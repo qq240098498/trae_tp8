@@ -13,15 +13,20 @@ import {
   User,
   Trash2,
   Edit2,
+  Flower2,
+  Sparkles,
 } from 'lucide-react'
 import { useAppStore } from '@/store/useAppStore'
 import {
   ORDER_STATUS_MAP,
   VEHICLE_ROLE_MAP,
+  CAR_DECORATION_TYPE_MAP,
   type Order,
   type OrderVehicleDetail,
   type Vehicle,
   type Driver,
+  type FlowerPackage,
+  type CarDecoration,
 } from '@/types'
 import { api } from '@/services/api'
 import { cn } from '@/lib/utils'
@@ -38,7 +43,7 @@ interface VehicleAssignment {
 }
 
 export default function Orders() {
-  const { orders, fetchOrders, addOrder, updateOrder, deleteOrder } = useAppStore()
+  const { orders, fetchOrders, addOrder, updateOrder, deleteOrder, flowerPackages, carDecorations, fetchFlowerPackages, fetchCarDecorations } = useAppStore()
   const [keyword, setKeyword] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [showModal, setShowModal] = useState(false)
@@ -46,7 +51,7 @@ export default function Orders() {
   const [editingOrder, setEditingOrder] = useState<Order | null>(null)
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [orderVehicles, setOrderVehicles] = useState<OrderVehicleDetail[]>([])
-  const [tab, setTab] = useState<'basic' | 'vehicles'>('basic')
+  const [tab, setTab] = useState<'basic' | 'vehicles' | 'extras'>('basic')
   const [conflictInfo, setConflictInfo] = useState<{
     hasConflict: boolean
     conflictVehicles: Array<Vehicle & { conflictOrders?: { orderId: number; orderNo: string; timeRange: string }[] }>
@@ -78,9 +83,19 @@ export default function Orders() {
     drivers: Driver[]
   }>({ vehicles: [], drivers: [] })
 
+  const [selectedFlowerPackageIds, setSelectedFlowerPackageIds] = useState<number[]>([])
+  const [selectedCarDecorationIds, setSelectedCarDecorationIds] = useState<number[]>([])
+  const [orderFlowerPackages, setOrderFlowerPackages] = useState<FlowerPackage[]>([])
+  const [orderCarDecorations, setOrderCarDecorations] = useState<CarDecoration[]>([])
+
   useEffect(() => {
     fetchOrders({ status: statusFilter, keyword })
   }, [fetchOrders, statusFilter, keyword])
+
+  useEffect(() => {
+    fetchFlowerPackages({ status: 'active' })
+    fetchCarDecorations({ status: 'active' })
+  }, [fetchFlowerPackages, fetchCarDecorations])
 
   const checkConflict = useCallback(async (weddingDate: string, departureTime: string, returnTime: string) => {
     if (!weddingDate || !departureTime || !returnTime) return
@@ -149,6 +164,8 @@ export default function Orders() {
       remark: '',
     })
     setVehicleAssignments([])
+    setSelectedFlowerPackageIds([])
+    setSelectedCarDecorationIds([])
     setConflictInfo(null)
     setTab('basic')
     setShowModal(true)
@@ -157,6 +174,8 @@ export default function Orders() {
   const handleEdit = async (order: Order) => {
     setEditingOrder(order)
     setFormData(order)
+    setSelectedFlowerPackageIds(order.flowerPackageIds || [])
+    setSelectedCarDecorationIds(order.carDecorationIds || [])
     try {
       const vehicles = await api.orders.getVehicles(order.id)
       const assignments = vehicles.map((v) => ({
@@ -182,6 +201,13 @@ export default function Orders() {
     try {
       const vehicles = await api.orders.getVehicles(order.id)
       setOrderVehicles(vehicles)
+    } catch (err) {
+      console.error(err)
+    }
+    try {
+      const detail = await api.orders.get(order.id) as any
+      setOrderFlowerPackages(detail.flowerPackages || [])
+      setOrderCarDecorations(detail.carDecorations || [])
     } catch (err) {
       console.error(err)
     }
@@ -232,6 +258,8 @@ export default function Orders() {
       const orderData = {
         ...formData,
         vehicles: vehicleAssignments,
+        flowerPackageIds: selectedFlowerPackageIds,
+        carDecorationIds: selectedCarDecorationIds,
       }
       if (editingOrder) {
         await updateOrder(editingOrder.id, orderData as Parameters<typeof updateOrder>[1])
@@ -281,7 +309,16 @@ export default function Orders() {
   }
 
   const calculateTotal = () => {
-    return vehicleAssignments.reduce((sum, v) => sum + v.serviceFee, 0)
+    const vehicleTotal = vehicleAssignments.reduce((sum, v) => sum + v.serviceFee, 0)
+    const flowerTotal = selectedFlowerPackageIds.reduce((sum, id) => {
+      const pkg = flowerPackages.find(p => p.id === id)
+      return sum + (pkg?.price || 0)
+    }, 0)
+    const decorationTotal = selectedCarDecorationIds.reduce((sum, id) => {
+      const dec = carDecorations.find(d => d.id === id)
+      return sum + (dec?.price || 0)
+    }, 0)
+    return vehicleTotal + flowerTotal + decorationTotal
   }
 
   return (
@@ -480,6 +517,22 @@ export default function Orders() {
                   </span>
                 )}
               </button>
+              <button
+                onClick={() => setTab('extras')}
+                className={cn(
+                  'px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors flex items-center gap-2',
+                  tab === 'extras'
+                    ? 'border-rose-600 text-rose-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700',
+                )}
+              >
+                配套服务
+                {(selectedFlowerPackageIds.length + selectedCarDecorationIds.length) > 0 && (
+                  <span className="rounded-full bg-rose-100 px-2 py-0.5 text-xs text-rose-600">
+                    {selectedFlowerPackageIds.length + selectedCarDecorationIds.length}
+                  </span>
+                )}
+              </button>
             </div>
 
             {conflictInfo && conflictInfo.hasConflict && (
@@ -669,7 +722,7 @@ export default function Orders() {
                         className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500"
                       />
                       <p className="mt-1 text-xs text-gray-400">
-                        车辆费用合计：¥{calculateTotal().toLocaleString()}
+                        费用合计：¥{calculateTotal().toLocaleString()}（车辆 + 配套）
                       </p>
                     </div>
                     <div>
@@ -879,6 +932,133 @@ export default function Orders() {
                 </div>
               )}
 
+              {tab === 'extras' && (
+                <div className="space-y-6">
+                  <div>
+                    <h4 className="mb-3 text-sm font-medium text-gray-700 flex items-center gap-2">
+                      <Flower2 className="h-4 w-4 text-rose-500" />
+                      鲜花配套套餐
+                    </h4>
+                    {flowerPackages.length === 0 ? (
+                      <p className="text-sm text-gray-400 py-4 text-center">暂无可用套餐</p>
+                    ) : (
+                      <div className="grid grid-cols-1 gap-3">
+                        {flowerPackages.map((pkg) => {
+                          const isSelected = selectedFlowerPackageIds.includes(pkg.id)
+                          return (
+                            <label
+                              key={pkg.id}
+                              className={cn(
+                                'flex items-start gap-3 rounded-lg border p-4 cursor-pointer transition-colors',
+                                isSelected
+                                  ? 'border-rose-300 bg-rose-50'
+                                  : 'border-gray-200 hover:border-gray-300',
+                              )}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={isSelected}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setSelectedFlowerPackageIds([...selectedFlowerPackageIds, pkg.id])
+                                  } else {
+                                    setSelectedFlowerPackageIds(selectedFlowerPackageIds.filter(id => id !== pkg.id))
+                                  }
+                                }}
+                                className="mt-1 h-4 w-4 rounded border-gray-300 text-rose-600 focus:ring-rose-500"
+                              />
+                              <div className="flex-1">
+                                <div className="flex items-center justify-between">
+                                  <span className="font-medium text-gray-800">{pkg.name}</span>
+                                  <span className="font-semibold text-rose-600">¥{pkg.price.toLocaleString()}</span>
+                                </div>
+                                <p className="mt-1 text-xs text-gray-500">{pkg.description}</p>
+                                <p className="mt-1 text-xs text-gray-400">包含：{pkg.items}</p>
+                              </div>
+                            </label>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
+
+                  <div>
+                    <h4 className="mb-3 text-sm font-medium text-gray-700 flex items-center gap-2">
+                      <Sparkles className="h-4 w-4 text-rose-500" />
+                      婚车装饰
+                    </h4>
+                    {carDecorations.length === 0 ? (
+                      <p className="text-sm text-gray-400 py-4 text-center">暂无可用装饰</p>
+                    ) : (
+                      <div className="grid grid-cols-1 gap-3">
+                        {carDecorations.map((dec) => {
+                          const isSelected = selectedCarDecorationIds.includes(dec.id)
+                          return (
+                            <label
+                              key={dec.id}
+                              className={cn(
+                                'flex items-start gap-3 rounded-lg border p-4 cursor-pointer transition-colors',
+                                isSelected
+                                  ? 'border-rose-300 bg-rose-50'
+                                  : 'border-gray-200 hover:border-gray-300',
+                              )}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={isSelected}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setSelectedCarDecorationIds([...selectedCarDecorationIds, dec.id])
+                                  } else {
+                                    setSelectedCarDecorationIds(selectedCarDecorationIds.filter(id => id !== dec.id))
+                                  }
+                                }}
+                                className="mt-1 h-4 w-4 rounded border-gray-300 text-rose-600 focus:ring-rose-500"
+                              />
+                              <div className="flex-1">
+                                <div className="flex items-center justify-between">
+                                  <span className="font-medium text-gray-800">{dec.name}</span>
+                                  <span className="font-semibold text-rose-600">¥{dec.price.toLocaleString()}</span>
+                                </div>
+                                <div className="mt-1 flex items-center gap-2">
+                                  <span className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
+                                    {CAR_DECORATION_TYPE_MAP[dec.decorationType] || dec.decorationType}
+                                  </span>
+                                  {dec.applicableVehicleTypes && (
+                                    <span className="text-xs text-gray-400">适用：{dec.applicableVehicleTypes}</span>
+                                  )}
+                                </div>
+                                <p className="mt-1 text-xs text-gray-500">{dec.description}</p>
+                              </div>
+                            </label>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
+
+                  {(selectedFlowerPackageIds.length > 0 || selectedCarDecorationIds.length > 0) && (
+                    <div className="rounded-lg bg-rose-50 p-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600">配套服务合计</span>
+                        <span className="text-lg font-bold text-rose-600">
+                          ¥{(
+                            selectedFlowerPackageIds.reduce((sum, id) => {
+                              const pkg = flowerPackages.find(p => p.id === id)
+                              return sum + (pkg?.price || 0)
+                            }, 0) +
+                            selectedCarDecorationIds.reduce((sum, id) => {
+                              const dec = carDecorations.find(d => d.id === id)
+                              return sum + (dec?.price || 0)
+                            }, 0)
+                          ).toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div className="mt-6 flex justify-end gap-3">
                 <button
                   type="button"
@@ -887,7 +1067,7 @@ export default function Orders() {
                 >
                   取消
                 </button>
-                {tab === 'basic' ? (
+                {tab === 'basic' && (
                   <button
                     type="button"
                     onClick={() => setTab('vehicles')}
@@ -896,7 +1076,18 @@ export default function Orders() {
                     下一步：车辆排班
                     <ArrowRight className="h-4 w-4" />
                   </button>
-                ) : (
+                )}
+                {tab === 'vehicles' && (
+                  <button
+                    type="button"
+                    onClick={() => setTab('extras')}
+                    className="flex items-center gap-1 rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-rose-700"
+                  >
+                    下一步：配套服务
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
+                )}
+                {tab === 'extras' && (
                   <button
                     type="submit"
                     className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-rose-700"
@@ -1037,6 +1228,51 @@ export default function Orders() {
                   </div>
                 )}
               </div>
+
+              {(orderFlowerPackages.length > 0 || orderCarDecorations.length > 0) && (
+                <div className="space-y-3">
+                  <h5 className="font-medium text-gray-800">配套服务</h5>
+                  {orderFlowerPackages.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-xs text-gray-500 flex items-center gap-1">
+                        <Flower2 className="h-3 w-3" />
+                        鲜花套餐
+                      </p>
+                      {orderFlowerPackages.map((pkg) => (
+                        <div key={pkg.id} className="flex items-center justify-between rounded-lg border border-gray-100 p-3">
+                          <div>
+                            <span className="text-sm font-medium text-gray-800">{pkg.name}</span>
+                            <p className="text-xs text-gray-400">{pkg.items}</p>
+                          </div>
+                          <span className="text-sm font-semibold text-rose-600">¥{pkg.price.toLocaleString()}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {orderCarDecorations.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-xs text-gray-500 flex items-center gap-1">
+                        <Sparkles className="h-3 w-3" />
+                        婚车装饰
+                      </p>
+                      {orderCarDecorations.map((dec) => (
+                        <div key={dec.id} className="flex items-center justify-between rounded-lg border border-gray-100 p-3">
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-medium text-gray-800">{dec.name}</span>
+                              <span className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
+                                {CAR_DECORATION_TYPE_MAP[dec.decorationType] || dec.decorationType}
+                              </span>
+                            </div>
+                            <p className="text-xs text-gray-400">{dec.description}</p>
+                          </div>
+                          <span className="text-sm font-semibold text-rose-600">¥{dec.price.toLocaleString()}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div className="rounded-lg border border-gray-200 p-4">
                 <div className="flex items-center justify-between">

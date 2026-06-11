@@ -134,6 +134,8 @@
       "status": "settled",
       "totalAmount": 6800,
       "depositAmount": 2000,
+      "flowerPackageIds": [],
+      "carDecorationIds": [],
       "remark": "客户要求准时",
       "createdAt": "2026-06-10T13:21:36.222Z",
       "updatedAt": "2026-06-10T13:21:36.222Z"
@@ -154,6 +156,8 @@
       "status": "settled",
       "totalAmount": 5600,
       "depositAmount": 1500,
+      "flowerPackageIds": [],
+      "carDecorationIds": [],
       "remark": "",
       "createdAt": "2026-06-10T13:21:36.222Z",
       "updatedAt": "2026-06-11T02:07:22.980Z"
@@ -174,6 +178,8 @@
       "status": "settled",
       "totalAmount": 8800,
       "depositAmount": 3000,
+      "flowerPackageIds": [],
+      "carDecorationIds": [],
       "remark": "重要客户，VIP服务",
       "createdAt": "2026-06-10T13:21:36.222Z",
       "updatedAt": "2026-06-11T02:07:18.685Z"
@@ -194,6 +200,8 @@
       "status": "scheduled",
       "totalAmount": 6200,
       "depositAmount": 2000,
+      "flowerPackageIds": [],
+      "carDecorationIds": [],
       "remark": "需要白色车队",
       "createdAt": "2026-06-10T13:21:36.222Z",
       "updatedAt": "2026-06-11T03:45:58.393Z",
@@ -226,6 +234,8 @@
       "status": "scheduled",
       "totalAmount": 7500,
       "depositAmount": 2500,
+      "flowerPackageIds": [],
+      "carDecorationIds": [],
       "remark": "",
       "createdAt": "2026-06-10T13:21:36.222Z",
       "updatedAt": "2026-06-11T03:45:51.722Z",
@@ -458,6 +468,21 @@
       "remark": "6万公里大保养",
       "createdAt": "2026-06-01T11:00:00.000Z",
       "updatedAt": "2026-06-01T11:00:00.000Z"
+    },
+    {
+      "id": 4,
+      "vehicleId": 1,
+      "serviceDate": "2026-07-03",
+      "serviceType": "常规保养",
+      "serviceItem": "323",
+      "mileage": 0,
+      "cost": 0,
+      "serviceProvider": "324",
+      "nextServiceDate": "2026-07-03",
+      "remark": "",
+      "createdAt": "2026-06-11T07:36:04.111Z",
+      "updatedAt": "2026-06-11T07:36:09.929Z",
+      "vehiclePlate": "京A·88888"
     }
   ],
   "insuranceRecords": [
@@ -559,13 +584,143 @@
       "id": 4,
       "vehicleId": 5,
       "inspectionDate": "",
-      "inspectionResult": "pending",
+      "inspectionResult": "pass",
       "inspectionAgency": "",
       "nextInspectionDate": "2026-07-01",
       "cost": 0,
       "remark": "待年检，需尽快办理",
       "createdAt": "2026-06-01T09:00:00.000Z",
-      "updatedAt": "2026-06-01T09:00:00.000Z"
+      "updatedAt": "2026-06-11T07:56:41.395Z",
+      "vehiclePlate": "京A·11111"
+    },
+    {
+      "id": 5,
+      "vehicleId": 1,
+      "inspectionDate": "2026-06-18",
+      "inspectionResult": "pass",
+      "inspectionAgency": "",
+      "nextInspectionDate": "2026-06-10",
+      "cost": 324,
+      "remark": "",
+      "createdAt": "2026-06-11T07:36:23.174Z",
+      "updatedAt": "2026-06-11T07:36:23.174Z"
+    }
+  ],
+  "flowerPackages": [
+    {
+      "id": 1,
+      "name": "经典红玫瑰套餐",
+      "description": "以红玫瑰为主花材，搭配满天星和尤加利叶，经典大气",
+      "price": 1280,
+      "items": "红玫瑰50支、满天星3扎、尤加利叶2扎、配叶适量",
+      "imageUrl": "",
+      "status": "active",
+      "remark": "最受欢迎套餐",
+      "createdAt": "2026-06-10T13:21:36.222Z",
+      "updatedAt": "2026-06-10T13:21:36.222Z"
+    },
+    {
+      "id": 2,
+      "name": "粉色梦幻套餐",
+      "description": "粉色系花艺，浪漫梦幻，适合粉色主题婚礼",
+      "price": 1580,
+      "items": "粉玫瑰30支、粉色康乃馨20支、粉色洋桔梗15支、配叶适量",
+      "imageUrl": "",
+      "status": "active",
+      "remark": "",
+      "createdAt": "2026-06-10T13:21:36.222Z",
+      "updatedAt": "2026-06-10T13:21:36.222Z"
+    },
+    {
+      "id": 3,
+      "name": "白色纯洁套餐",
+      "description": "白色系花艺，纯洁优雅，适合西式婚礼",
+      "price": 1880,
+      "items": "白玫瑰40支、白色百合10支、白色洋桔梗20支、配叶适量",
+      "imageUrl": "",
+      "status": "active",
+      "remark": "高端定制",
+      "createdAt": "2026-06-10T13:21:36.222Z",
+      "updatedAt": "2026-06-10T13:21:36.222Z"
+    },
+    {
+      "id": 4,
+      "name": "奢华全花套餐",
+      "description": "全车鲜花覆盖，含车头、车身、车内全套花艺装饰",
+      "price": 3280,
+      "items": "混合鲜花200支以上，含车头V型花、车门花、后视镜花、车内仪表盘花",
+      "imageUrl": "",
+      "status": "active",
+      "remark": "全车豪华装饰",
+      "createdAt": "2026-06-10T13:21:36.222Z",
+      "updatedAt": "2026-06-10T13:21:36.222Z"
+    }
+  ],
+  "carDecorations": [
+    {
+      "id": 1,
+      "name": "V型车头花艺",
+      "decorationType": "front",
+      "description": "经典V型车头鲜花装饰，适合主婚车",
+      "price": 880,
+      "applicableVehicleTypes": "豪华型,轿车",
+      "imageUrl": "",
+      "status": "active",
+      "remark": "主婚车标配",
+      "createdAt": "2026-06-10T13:21:36.222Z",
+      "updatedAt": "2026-06-10T13:21:36.222Z"
+    },
+    {
+      "id": 2,
+      "name": "全车鲜花装饰",
+      "decorationType": "full",
+      "description": "车头、车身、后视镜、后备箱全套鲜花装饰",
+      "price": 2680,
+      "applicableVehicleTypes": "豪华型,轿车,SUV",
+      "imageUrl": "",
+      "status": "active",
+      "remark": "",
+      "createdAt": "2026-06-10T13:21:36.222Z",
+      "updatedAt": "2026-06-10T13:21:36.222Z"
+    },
+    {
+      "id": 3,
+      "name": "车身花艺条",
+      "decorationType": "side",
+      "description": "车门把手及车身侧面粉色花艺装饰条",
+      "price": 580,
+      "applicableVehicleTypes": "豪华型,轿车,SUV,其他",
+      "imageUrl": "",
+      "status": "active",
+      "remark": "跟车可选",
+      "createdAt": "2026-06-10T13:21:36.222Z",
+      "updatedAt": "2026-06-10T13:21:36.222Z"
+    },
+    {
+      "id": 4,
+      "name": "后备箱花艺",
+      "decorationType": "trunk",
+      "description": "后备箱鲜花装饰，适合新人合影",
+      "price": 680,
+      "applicableVehicleTypes": "豪华型,轿车,SUV",
+      "imageUrl": "",
+      "status": "active",
+      "remark": "",
+      "createdAt": "2026-06-10T13:21:36.222Z",
+      "updatedAt": "2026-06-10T13:21:36.222Z"
+    },
+    {
+      "id": 5,
+      "name": "车内氛围装饰",
+      "decorationType": "interior",
+      "description": "仪表盘花艺、后视镜挂饰、座椅花环等车内装饰",
+      "price": 480,
+      "applicableVehicleTypes": "豪华型,轿车,SUV,其他",
+      "imageUrl": "",
+      "status": "active",
+      "remark": "",
+      "createdAt": "2026-06-10T13:21:36.222Z",
+      "updatedAt": "2026-06-10T13:21:36.222Z"
     }
   ]
 }

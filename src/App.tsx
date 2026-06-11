@@ -5,6 +5,8 @@ import Drivers from "@/pages/Drivers";
 import Vehicles from "@/pages/Vehicles";
 import VehicleLedger from "@/pages/VehicleLedger";
 import Orders from "@/pages/Orders";
+import FlowerPackages from "@/pages/FlowerPackages";
+import CarDecorations from "@/pages/CarDecorations";
 import Settlements from "@/pages/Settlements";
 import Statistics from "@/pages/Statistics";
 
@@ -18,6 +20,8 @@ export default function App() {
           <Route path="/vehicles" element={<Vehicles />} />
           <Route path="/vehicle-ledger" element={<VehicleLedger />} />
           <Route path="/orders" element={<Orders />} />
+          <Route path="/flower-packages" element={<FlowerPackages />} />
+          <Route path="/car-decorations" element={<CarDecorations />} />
           <Route path="/settlements" element={<Settlements />} />
           <Route path="/statistics" element={<Statistics />} />
         </Route>

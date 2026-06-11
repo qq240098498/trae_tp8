@@ -15,6 +15,8 @@ import type {
   MaintenanceRecord,
   InsuranceRecord,
   InspectionRecord,
+  FlowerPackage,
+  CarDecoration,
 } from '@/types'
 import { api } from '@/services/api'
 
@@ -26,6 +28,8 @@ interface AppState {
   maintenanceRecords: MaintenanceRecord[]
   insuranceRecords: InsuranceRecord[]
   inspectionRecords: InspectionRecord[]
+  flowerPackages: FlowerPackage[]
+  carDecorations: CarDecoration[]
   stats: {
     overview: StatsOverview | null
     monthlyData: MonthlyData[]
@@ -45,6 +49,8 @@ interface AppState {
   fetchMaintenanceRecords: (params?: { vehicleId?: string | number; keyword?: string }) => Promise<void>
   fetchInsuranceRecords: (params?: { vehicleId?: string | number; keyword?: string }) => Promise<void>
   fetchInspectionRecords: (params?: { vehicleId?: string | number; keyword?: string; result?: string }) => Promise<void>
+  fetchFlowerPackages: (params?: { status?: string; keyword?: string }) => Promise<void>
+  fetchCarDecorations: (params?: { status?: string; decorationType?: string; keyword?: string }) => Promise<void>
   fetchStatsOverview: () => Promise<void>
   fetchStatsMonthly: () => Promise<void>
   fetchStatsStatus: () => Promise<void>
@@ -74,6 +80,14 @@ interface AppState {
   updateInspectionRecord: (id: number, data: Partial<InspectionRecord>) => Promise<InspectionRecord>
   deleteInspectionRecord: (id: number) => Promise<void>
 
+  addFlowerPackage: (data: Partial<FlowerPackage>) => Promise<FlowerPackage>
+  updateFlowerPackage: (id: number, data: Partial<FlowerPackage>) => Promise<FlowerPackage>
+  deleteFlowerPackage: (id: number) => Promise<void>
+
+  addCarDecoration: (data: Partial<CarDecoration>) => Promise<CarDecoration>
+  updateCarDecoration: (id: number, data: Partial<CarDecoration>) => Promise<CarDecoration>
+  deleteCarDecoration: (id: number) => Promise<void>
+
   addOrder: (data: Partial<Order> & { vehicles?: Array<Partial<import('@/types').OrderVehicle>> }) => Promise<Order>
   updateOrder: (
     id: number,
@@ -97,6 +111,8 @@ export const useAppStore = create<AppState>((set) => ({
   maintenanceRecords: [],
   insuranceRecords: [],
   inspectionRecords: [],
+  flowerPackages: [],
+  carDecorations: [],
   stats: {
     overview: null,
     monthlyData: [],
@@ -186,6 +202,30 @@ export const useAppStore = create<AppState>((set) => ({
     try {
       const data = await api.inspection.list(params)
       set({ inspectionRecords: data })
+    } catch (err) {
+      set({ error: (err as Error).message })
+    } finally {
+      set({ loading: false })
+    }
+  },
+
+  fetchFlowerPackages: async (params) => {
+    set({ loading: true, error: null })
+    try {
+      const data = await api.flowerPackages.list(params)
+      set({ flowerPackages: data })
+    } catch (err) {
+      set({ error: (err as Error).message })
+    } finally {
+      set({ loading: false })
+    }
+  },
+
+  fetchCarDecorations: async (params) => {
+    set({ loading: true, error: null })
+    try {
+      const data = await api.carDecorations.list(params)
+      set({ carDecorations: data })
     } catch (err) {
       set({ error: (err as Error).message })
     } finally {
@@ -410,6 +450,48 @@ export const useAppStore = create<AppState>((set) => ({
     await api.inspection.remove(id)
     set((state) => ({
       inspectionRecords: state.inspectionRecords.filter((r) => r.id !== id),
+    }))
+  },
+
+  addFlowerPackage: async (data) => {
+    const pkg = await api.flowerPackages.create(data)
+    set((state) => ({ flowerPackages: [...state.flowerPackages, pkg] }))
+    return pkg
+  },
+
+  updateFlowerPackage: async (id, data) => {
+    const pkg = await api.flowerPackages.update(id, data)
+    set((state) => ({
+      flowerPackages: state.flowerPackages.map((p) => (p.id === id ? pkg : p)),
+    }))
+    return pkg
+  },
+
+  deleteFlowerPackage: async (id) => {
+    await api.flowerPackages.remove(id)
+    set((state) => ({
+      flowerPackages: state.flowerPackages.filter((p) => p.id !== id),
+    }))
+  },
+
+  addCarDecoration: async (data) => {
+    const dec = await api.carDecorations.create(data)
+    set((state) => ({ carDecorations: [...state.carDecorations, dec] }))
+    return dec
+  },
+
+  updateCarDecoration: async (id, data) => {
+    const dec = await api.carDecorations.update(id, data)
+    set((state) => ({
+      carDecorations: state.carDecorations.map((d) => (d.id === id ? dec : d)),
+    }))
+    return dec
+  },
+
+  deleteCarDecoration: async (id) => {
+    await api.carDecorations.remove(id)
+    set((state) => ({
+      carDecorations: state.carDecorations.filter((d) => d.id !== id),
     }))
   },
 

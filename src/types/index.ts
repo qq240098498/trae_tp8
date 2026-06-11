@@ -28,6 +28,33 @@ export interface Vehicle {
   updatedAt: string
 }
 
+export interface FlowerPackage {
+  id: number
+  name: string
+  description: string
+  price: number
+  items: string
+  imageUrl: string
+  status: 'active' | 'inactive'
+  remark: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CarDecoration {
+  id: number
+  name: string
+  decorationType: string
+  description: string
+  price: number
+  applicableVehicleTypes: string
+  imageUrl: string
+  status: 'active' | 'inactive'
+  remark: string
+  createdAt: string
+  updatedAt: string
+}
+
 export interface Order {
   id: number
   orderNo: string
@@ -44,6 +71,8 @@ export interface Order {
   status: 'pending' | 'scheduled' | 'departed' | 'returned' | 'settled' | 'cancelled'
   totalAmount: number
   depositAmount: number
+  flowerPackageIds: number[]
+  carDecorationIds: number[]
   remark: string
   createdAt: string
   updatedAt: string
@@ -251,4 +280,23 @@ export const INSPECTION_RESULT_MAP: Record<string, { label: string; color: strin
   pass: { label: '合格', color: 'bg-green-100 text-green-800' },
   fail: { label: '不合格', color: 'bg-red-100 text-red-800' },
   pending: { label: '待检', color: 'bg-yellow-100 text-yellow-800' },
+}
+
+export const FLOWER_PACKAGE_STATUS_MAP: Record<string, { label: string; color: string }> = {
+  active: { label: '上架', color: 'bg-green-100 text-green-800' },
+  inactive: { label: '下架', color: 'bg-gray-100 text-gray-800' },
+}
+
+export const CAR_DECORATION_STATUS_MAP: Record<string, { label: string; color: string }> = {
+  active: { label: '上架', color: 'bg-green-100 text-green-800' },
+  inactive: { label: '下架', color: 'bg-gray-100 text-gray-800' },
+}
+
+export const CAR_DECORATION_TYPE_MAP: Record<string, string> = {
+  front: '车头花艺',
+  full: '全车装饰',
+  side: '车身花艺',
+  trunk: '后备箱花艺',
+  interior: '车内装饰',
+  custom: '定制装饰',
 }
