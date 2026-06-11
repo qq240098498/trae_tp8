@@ -17,6 +17,7 @@ import type {
   InspectionRecord,
   FlowerPackage,
   CarDecoration,
+  RepairOrder,
 } from '@/types'
 import { api } from '@/services/api'
 
@@ -30,6 +31,7 @@ interface AppState {
   inspectionRecords: InspectionRecord[]
   flowerPackages: FlowerPackage[]
   carDecorations: CarDecoration[]
+  repairOrders: RepairOrder[]
   stats: {
     overview: StatsOverview | null
     monthlyData: MonthlyData[]
@@ -51,6 +53,7 @@ interface AppState {
   fetchInspectionRecords: (params?: { vehicleId?: string | number; keyword?: string; result?: string }) => Promise<void>
   fetchFlowerPackages: (params?: { status?: string; keyword?: string }) => Promise<void>
   fetchCarDecorations: (params?: { status?: string; decorationType?: string; keyword?: string }) => Promise<void>
+  fetchRepairOrders: (params?: { vehicleId?: string | number; status?: string; keyword?: string }) => Promise<void>
   fetchStatsOverview: () => Promise<void>
   fetchStatsMonthly: () => Promise<void>
   fetchStatsStatus: () => Promise<void>
@@ -88,6 +91,14 @@ interface AppState {
   updateCarDecoration: (id: number, data: Partial<CarDecoration>) => Promise<CarDecoration>
   deleteCarDecoration: (id: number) => Promise<void>
 
+  addRepairOrder: (data: Partial<RepairOrder>) => Promise<RepairOrder>
+  updateRepairOrder: (id: number, data: Partial<RepairOrder>) => Promise<RepairOrder>
+  deleteRepairOrder: (id: number) => Promise<void>
+  assignRepairOrder: (id: number, data: { assignee?: string; serviceProvider?: string; estimatedCost?: number; startDate?: string }) => Promise<RepairOrder>
+  startRepairOrder: (id: number) => Promise<RepairOrder>
+  completeRepairOrder: (id: number, data?: { actualCost?: number; completeDate?: string; repairItems?: string; remark?: string }) => Promise<RepairOrder>
+  cancelRepairOrder: (id: number) => Promise<RepairOrder>
+
   addOrder: (data: Partial<Order> & { vehicles?: Array<Partial<import('@/types').OrderVehicle>> }) => Promise<Order>
   updateOrder: (
     id: number,
@@ -113,6 +124,7 @@ export const useAppStore = create<AppState>((set) => ({
   inspectionRecords: [],
   flowerPackages: [],
   carDecorations: [],
+  repairOrders: [],
   stats: {
     overview: null,
     monthlyData: [],
@@ -226,6 +238,18 @@ export const useAppStore = create<AppState>((set) => ({
     try {
       const data = await api.carDecorations.list(params)
       set({ carDecorations: data })
+    } catch (err) {
+      set({ error: (err as Error).message })
+    } finally {
+      set({ loading: false })
+    }
+  },
+
+  fetchRepairOrders: async (params) => {
+    set({ loading: true, error: null })
+    try {
+      const data = await api.repairOrders.list(params)
+      set({ repairOrders: data })
     } catch (err) {
       set({ error: (err as Error).message })
     } finally {
@@ -493,6 +517,74 @@ export const useAppStore = create<AppState>((set) => ({
     set((state) => ({
       carDecorations: state.carDecorations.filter((d) => d.id !== id),
     }))
+  },
+
+  addRepairOrder: async (data) => {
+    const order = await api.repairOrders.create(data)
+    set((state) => ({ repairOrders: [order, ...state.repairOrders] }))
+    return order
+  },
+
+  updateRepairOrder: async (id, data) => {
+    const order = await api.repairOrders.update(id, data)
+    set((state) => ({
+      repairOrders: state.repairOrders.map((o) => (o.id === id ? order : o)),
+      vehicles: state.vehicles.map((v) =>
+        v.id === order.vehicleId
+          ? { ...v, status: 'maintenance' as const }
+          : v,
+      ),
+    }))
+    return order
+  },
+
+  deleteRepairOrder: async (id) => {
+    await api.repairOrders.remove(id)
+    set((state) => ({
+      repairOrders: state.repairOrders.filter((o) => o.id !== id),
+    }))
+  },
+
+  assignRepairOrder: async (id, data) => {
+    const order = await api.repairOrders.assign(id, data)
+    set((state) => ({
+      repairOrders: state.repairOrders.map((o) => (o.id === id ? order : o)),
+      vehicles: state.vehicles.map((v) =>
+        v.id === order.vehicleId
+          ? { ...v, status: 'maintenance' as const }
+          : v,
+      ),
+    }))
+    return order
+  },
+
+  startRepairOrder: async (id) => {
+    const order = await api.repairOrders.start(id)
+    set((state) => ({
+      repairOrders: state.repairOrders.map((o) => (o.id === id ? order : o)),
+    }))
+    return order
+  },
+
+  completeRepairOrder: async (id, data) => {
+    const order = await api.repairOrders.complete(id, data)
+    set((state) => ({
+      repairOrders: state.repairOrders.map((o) => (o.id === id ? order : o)),
+      vehicles: state.vehicles.map((v) =>
+        v.id === order.vehicleId
+          ? { ...v, status: 'available' as const }
+          : v,
+      ),
+    }))
+    return order
+  },
+
+  cancelRepairOrder: async (id) => {
+    const order = await api.repairOrders.cancel(id)
+    set((state) => ({
+      repairOrders: state.repairOrders.map((o) => (o.id === id ? order : o)),
+    }))
+    return order
   },
 
   addOrder: async (data) => {

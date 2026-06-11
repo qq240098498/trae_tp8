@@ -162,6 +162,30 @@ export interface CarDecoration {
   updatedAt: string
 }
 
+export interface RepairOrder {
+  id: number
+  orderNo: string
+  vehicleId: number
+  reportDate: string
+  reporter: string
+  repairType: 'maintenance' | 'repair' | 'accident' | 'other'
+  priority: 'normal' | 'urgent' | 'emergency'
+  title: string
+  description: string
+  status: 'pending' | 'assigned' | 'in_progress' | 'completed' | 'cancelled'
+  assignee?: string
+  serviceProvider?: string
+  estimatedCost?: number
+  actualCost?: number
+  startDate?: string
+  completeDate?: string
+  mileage?: number
+  repairItems?: string
+  remark?: string
+  createdAt: string
+  updatedAt: string
+}
+
 export interface Database {
   drivers: Driver[]
   vehicles: Vehicle[]
@@ -173,6 +197,7 @@ export interface Database {
   inspectionRecords: InspectionRecord[]
   flowerPackages: FlowerPackage[]
   carDecorations: CarDecoration[]
+  repairOrders: RepairOrder[]
 }
 
 function readDB(): Database {

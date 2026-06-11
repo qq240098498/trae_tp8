@@ -304,3 +304,70 @@ export const CAR_DECORATION_TYPE_MAP: Record<string, string> = {
   interior: '车内装饰',
   custom: '定制装饰',
 }
+
+export interface RepairOrder {
+  id: number
+  orderNo: string
+  vehicleId: number
+  vehiclePlate?: string
+  reportDate: string
+  reporter: string
+  repairType: 'maintenance' | 'repair' | 'accident' | 'other'
+  priority: 'normal' | 'urgent' | 'emergency'
+  title: string
+  description: string
+  status: 'pending' | 'assigned' | 'in_progress' | 'completed' | 'cancelled'
+  assignee?: string
+  serviceProvider?: string
+  estimatedCost?: number
+  actualCost?: number
+  startDate?: string
+  completeDate?: string
+  mileage?: number
+  repairItems?: string
+  remark?: string
+  createdAt: string
+  updatedAt: string
+}
+
+export const REPAIR_STATUS_MAP: Record<string, { label: string; color: string }> = {
+  pending: { label: '待派修', color: 'bg-yellow-100 text-yellow-800' },
+  assigned: { label: '已派修', color: 'bg-blue-100 text-blue-800' },
+  in_progress: { label: '维修中', color: 'bg-purple-100 text-purple-800' },
+  completed: { label: '已完成', color: 'bg-green-100 text-green-800' },
+  cancelled: { label: '已取消', color: 'bg-gray-100 text-gray-800' },
+}
+
+export const REPAIR_TYPE_MAP: Record<string, { label: string; color: string }> = {
+  maintenance: { label: '常规保养', color: 'bg-blue-100 text-blue-800' },
+  repair: { label: '故障维修', color: 'bg-red-100 text-red-800' },
+  accident: { label: '事故维修', color: 'bg-orange-100 text-orange-800' },
+  other: { label: '其他', color: 'bg-gray-100 text-gray-800' },
+}
+
+export const REPAIR_PRIORITY_MAP: Record<string, { label: string; color: string }> = {
+  normal: { label: '普通', color: 'bg-gray-100 text-gray-800' },
+  urgent: { label: '紧急', color: 'bg-orange-100 text-orange-800' },
+  emergency: { label: '特急', color: 'bg-red-100 text-red-800' },
+}
+
+export const REPAIR_TYPE_OPTIONS = [
+  { value: 'maintenance', label: '常规保养' },
+  { value: 'repair', label: '故障维修' },
+  { value: 'accident', label: '事故维修' },
+  { value: 'other', label: '其他' },
+]
+
+export const REPAIR_PRIORITY_OPTIONS = [
+  { value: 'normal', label: '普通' },
+  { value: 'urgent', label: '紧急' },
+  { value: 'emergency', label: '特急' },
+]
+
+export const REPAIR_STATUS_OPTIONS = [
+  { value: 'pending', label: '待派修' },
+  { value: 'assigned', label: '已派修' },
+  { value: 'in_progress', label: '维修中' },
+  { value: 'completed', label: '已完成' },
+  { value: 'cancelled', label: '已取消' },
+]

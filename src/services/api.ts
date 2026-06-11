@@ -324,4 +324,47 @@ export const api = {
         body: JSON.stringify({ status }),
       }),
   },
+
+  repairOrders: {
+    list: (params?: { vehicleId?: string | number; status?: string; keyword?: string }) => {
+      const query = new URLSearchParams()
+      if (params?.vehicleId) query.set('vehicleId', String(params.vehicleId))
+      if (params?.status) query.set('status', params.status)
+      if (params?.keyword) query.set('keyword', params.keyword)
+      return request<import('@/types').RepairOrder[]>(`/repair-orders?${query.toString()}`)
+    },
+    get: (id: number) => request<import('@/types').RepairOrder>(`/repair-orders/${id}`),
+    create: (data: Partial<import('@/types').RepairOrder>) =>
+      request<import('@/types').RepairOrder>('/repair-orders', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    update: (id: number, data: Partial<import('@/types').RepairOrder>) =>
+      request<import('@/types').RepairOrder>(`/repair-orders/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      }),
+    remove: (id: number) =>
+      request<{ message: string }>(`/repair-orders/${id}`, {
+        method: 'DELETE',
+      }),
+    assign: (id: number, data: { assignee?: string; serviceProvider?: string; estimatedCost?: number; startDate?: string }) =>
+      request<import('@/types').RepairOrder>(`/repair-orders/${id}/assign`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      }),
+    start: (id: number) =>
+      request<import('@/types').RepairOrder>(`/repair-orders/${id}/start`, {
+        method: 'PATCH',
+      }),
+    complete: (id: number, data?: { actualCost?: number; completeDate?: string; repairItems?: string; remark?: string }) =>
+      request<import('@/types').RepairOrder>(`/repair-orders/${id}/complete`, {
+        method: 'PATCH',
+        body: JSON.stringify(data || {}),
+      }),
+    cancel: (id: number) =>
+      request<import('@/types').RepairOrder>(`/repair-orders/${id}/cancel`, {
+        method: 'PATCH',
+      }),
+  },
 }

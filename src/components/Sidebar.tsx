@@ -9,6 +9,7 @@ import {
   Flower2,
   BookOpen,
   Sparkles,
+  Wrench,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -17,6 +18,7 @@ const menuItems = [
   { path: '/drivers', label: '司机管理', icon: Users },
   { path: '/vehicles', label: '车辆管理', icon: Car },
   { path: '/vehicle-ledger', label: '车辆台账', icon: BookOpen },
+  { path: '/repair-orders', label: '维修工单', icon: Wrench },
   { path: '/orders', label: '订单管理', icon: Calendar },
   { path: '/flower-packages', label: '鲜花套餐', icon: Flower2 },
   { path: '/car-decorations', label: '婚车装饰', icon: Sparkles },

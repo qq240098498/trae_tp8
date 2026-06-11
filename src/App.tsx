@@ -4,6 +4,7 @@ import Dashboard from "@/pages/Dashboard";
 import Drivers from "@/pages/Drivers";
 import Vehicles from "@/pages/Vehicles";
 import VehicleLedger from "@/pages/VehicleLedger";
+import RepairOrders from "@/pages/RepairOrders";
 import Orders from "@/pages/Orders";
 import FlowerPackages from "@/pages/FlowerPackages";
 import CarDecorations from "@/pages/CarDecorations";
@@ -19,6 +20,7 @@ export default function App() {
           <Route path="/drivers" element={<Drivers />} />
           <Route path="/vehicles" element={<Vehicles />} />
           <Route path="/vehicle-ledger" element={<VehicleLedger />} />
+          <Route path="/repair-orders" element={<RepairOrders />} />
           <Route path="/orders" element={<Orders />} />
           <Route path="/flower-packages" element={<FlowerPackages />} />
           <Route path="/car-decorations" element={<CarDecorations />} />

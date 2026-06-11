@@ -22,6 +22,7 @@ import insuranceRoutes from './routes/insurance.js'
 import inspectionRoutes from './routes/inspection.js'
 import flowerPackagesRoutes from './routes/flowerPackages.js'
 import carDecorationsRoutes from './routes/carDecorations.js'
+import repairOrdersRoutes from './routes/repairOrders.js'
 
 // for esm mode
 const __filename = fileURLToPath(import.meta.url)
@@ -50,6 +51,7 @@ app.use('/api/insurance', insuranceRoutes)
 app.use('/api/inspection', inspectionRoutes)
 app.use('/api/flower-packages', flowerPackagesRoutes)
 app.use('/api/car-decorations', carDecorationsRoutes)
+app.use('/api/repair-orders', repairOrdersRoutes)
 
 /**
  * health
