@@ -65,6 +65,7 @@ export default function Dashboard() {
     },
   ]
 
+  const chartHeight = 200
   const maxMonthlyCount = Math.max(...monthlyData.map((m) => m.count), 1)
   const maxMonthlyRevenue = Math.max(...monthlyData.map((m) => m.revenue), 1)
 
@@ -114,23 +115,25 @@ export default function Dashboard() {
               </span>
             </div>
           </div>
-          <div className="mt-6 h-64">
-            <div className="flex h-full items-end justify-between gap-2">
+          <div className="mt-6">
+            <div className="flex justify-between gap-2" style={{ height: `${chartHeight}px` }}>
               {monthlyData.map((item) => (
-                <div key={item.month} className="flex flex-1 flex-col items-center gap-2">
-                  <div className="flex h-full w-full items-end justify-center gap-1">
+                <div key={item.month} className="flex-1 flex flex-col items-center h-full">
+                  <div className="flex-1 w-full flex items-end justify-center gap-1">
                     <div
                       className="w-3 rounded-t bg-rose-500 transition-all hover:bg-rose-600"
-                      style={{ height: `${(item.count / maxMonthlyCount) * 100}%` }}
+                      style={{ height: `${Math.max((item.count / maxMonthlyCount) * chartHeight, item.count > 0 ? 4 : 0)}px` }}
                       title={`订单数: ${item.count}`}
                     ></div>
                     <div
                       className="w-3 rounded-t bg-blue-400 transition-all hover:bg-blue-500"
-                      style={{ height: `${(item.revenue / maxMonthlyRevenue) * 100}%` }}
+                      style={{ height: `${Math.max((item.revenue / maxMonthlyRevenue) * chartHeight, item.revenue > 0 ? 4 : 0)}px` }}
                       title={`营收: ¥${item.revenue.toLocaleString()}`}
                     ></div>
                   </div>
-                  <span className="text-xs text-gray-500">{item.month}</span>
+                  <div className="mt-2 text-center">
+                    <span className="text-xs text-gray-500">{item.month}</span>
+                  </div>
                 </div>
               ))}
             </div>

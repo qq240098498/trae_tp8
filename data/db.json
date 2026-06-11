@@ -196,12 +196,12 @@
       "depositAmount": 2000,
       "remark": "需要白色车队",
       "createdAt": "2026-06-10T13:21:36.222Z",
-      "updatedAt": "2026-06-11T03:07:36.603Z",
+      "updatedAt": "2026-06-11T03:45:58.393Z",
       "vehicles": [
         {
           "id": 9,
-          "vehicleId": 2,
-          "driverId": 3,
+          "vehicleId": 1,
+          "driverId": 1,
           "role": "lead",
           "sequence": 1,
           "estimatedMileage": 50,
@@ -228,12 +228,12 @@
       "depositAmount": 2500,
       "remark": "",
       "createdAt": "2026-06-10T13:21:36.222Z",
-      "updatedAt": "2026-06-11T03:07:26.670Z",
+      "updatedAt": "2026-06-11T03:45:51.722Z",
       "vehicles": [
         {
           "id": 10,
-          "vehicleId": 4,
-          "driverId": 2,
+          "vehicleId": 1,
+          "driverId": 1,
           "role": "lead",
           "sequence": 1,
           "estimatedMileage": 50,
@@ -356,8 +356,8 @@
     {
       "id": 9,
       "orderId": 4,
-      "vehicleId": 2,
-      "driverId": 3,
+      "vehicleId": 1,
+      "driverId": 1,
       "sequence": 1,
       "role": "lead",
       "estimatedMileage": 50,
@@ -367,8 +367,8 @@
     {
       "id": 10,
       "orderId": 5,
-      "vehicleId": 4,
-      "driverId": 2,
+      "vehicleId": 1,
+      "driverId": 1,
       "sequence": 1,
       "role": "lead",
       "estimatedMileage": 50,
