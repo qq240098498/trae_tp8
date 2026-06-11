@@ -116,18 +116,23 @@ export const api = {
         method: 'PATCH',
         body: JSON.stringify({ status }),
       }),
-    checkConflict: (data: { weddingDate: string; vehicleIds?: number[]; driverIds?: number[]; excludeOrderId?: number }) =>
-      request<{ hasConflict: boolean; conflictVehicles: import('@/types').Vehicle[]; conflictDrivers: import('@/types').Driver[] }>(
+    checkConflict: (data: { weddingDate: string; departureTime: string; returnTime: string; vehicleIds?: number[]; driverIds?: number[]; excludeOrderId?: number }) =>
+      request<{ hasConflict: boolean; conflictVehicles: Array<import('@/types').Vehicle & { conflictOrders?: { orderId: number; orderNo: string; timeRange: string }[] }>; conflictDrivers: import('@/types').Driver[] }>(
         '/orders/check-conflict',
         {
           method: 'POST',
           body: JSON.stringify(data),
         },
       ),
-    getAvailable: (date: string) =>
-      request<{ vehicles: import('@/types').Vehicle[]; drivers: import('@/types').Driver[] }>(
-        `/orders/schedule/available?date=${date}`,
-      ),
+    getAvailable: (date: string, departureTime?: string, returnTime?: string) => {
+      const query = new URLSearchParams()
+      query.set('date', date)
+      if (departureTime) query.set('departureTime', departureTime)
+      if (returnTime) query.set('returnTime', returnTime)
+      return request<{ vehicles: import('@/types').Vehicle[]; drivers: import('@/types').Driver[] }>(
+        `/orders/schedule/available?${query.toString()}`,
+      )
+    },
     depart: (id: number, data?: { vehicleIds?: number[]; departureTime?: string; actualMileage?: number }) =>
       request<import('@/types').Order>(`/orders/${id}/depart`, {
         method: 'POST',

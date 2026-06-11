@@ -49,7 +49,7 @@ export default function Orders() {
   const [tab, setTab] = useState<'basic' | 'vehicles'>('basic')
   const [conflictInfo, setConflictInfo] = useState<{
     hasConflict: boolean
-    conflictVehicles: Vehicle[]
+    conflictVehicles: Array<Vehicle & { conflictOrders?: { orderId: number; orderNo: string; timeRange: string }[] }>
     conflictDrivers: Driver[]
   } | null>(null)
 
@@ -82,8 +82,8 @@ export default function Orders() {
     fetchOrders({ status: statusFilter, keyword })
   }, [fetchOrders, statusFilter, keyword])
 
-  const checkConflict = useCallback(async (weddingDate: string) => {
-    if (!weddingDate) return
+  const checkConflict = useCallback(async (weddingDate: string, departureTime: string, returnTime: string) => {
+    if (!weddingDate || !departureTime || !returnTime) return
     try {
       const vIds = vehicleAssignments.map((v) => v.vehicleId).filter(Boolean)
       const dIds = vehicleAssignments.map((v) => v.driverId).filter(Boolean)
@@ -93,6 +93,8 @@ export default function Orders() {
       }
       const result = await api.orders.checkConflict({
         weddingDate,
+        departureTime,
+        returnTime,
         vehicleIds: vIds,
         driverIds: dIds,
         excludeOrderId: editingOrder?.id,
@@ -103,10 +105,10 @@ export default function Orders() {
     }
   }, [vehicleAssignments, editingOrder?.id])
 
-  const loadAvailable = useCallback(async (date: string) => {
+  const loadAvailable = useCallback(async (date: string, departureTime?: string, returnTime?: string) => {
     if (!date) return
     try {
-      const result = await api.orders.getAvailable(date)
+      const result = await api.orders.getAvailable(date, departureTime, returnTime)
       setAvailableResources(result)
     } catch (err) {
       console.error(err)
@@ -115,10 +117,19 @@ export default function Orders() {
 
   useEffect(() => {
     if (showModal && formData.weddingDate) {
-      loadAvailable(formData.weddingDate)
-      checkConflict(formData.weddingDate)
+      loadAvailable(formData.weddingDate, formData.departureTime, formData.returnTime)
+      checkConflict(formData.weddingDate, formData.departureTime || '08:00', formData.returnTime || '18:00')
     }
-  }, [showModal, formData.weddingDate, checkConflict, loadAvailable])
+  }, [showModal, formData.weddingDate, formData.departureTime, formData.returnTime, checkConflict, loadAvailable])
+
+  useEffect(() => {
+    if (showModal && formData.weddingDate && vehicleAssignments.length > 0) {
+      checkConflict(formData.weddingDate, formData.departureTime || '08:00', formData.returnTime || '18:00')
+    }
+    if (showModal && formData.weddingDate && vehicleAssignments.length === 0) {
+      setConflictInfo(null)
+    }
+  }, [showModal, formData.weddingDate, formData.departureTime, formData.returnTime, vehicleAssignments, checkConflict])
 
   const handleAdd = () => {
     setEditingOrder(null)
@@ -476,18 +487,32 @@ export default function Orders() {
                 <AlertTriangle className="h-5 w-5 flex-shrink-0 text-yellow-600" />
                 <div>
                   <p className="font-medium text-yellow-800">档期冲突提醒</p>
-                  <div className="mt-1 text-sm text-yellow-700">
+                  <div className="mt-2 text-sm text-yellow-700 space-y-2">
                     {conflictInfo.conflictVehicles.length > 0 && (
-                      <p>
-                        冲突车辆：
-                        {conflictInfo.conflictVehicles.map((v) => v.plateNumber).join('、')}
-                      </p>
+                      <div>
+                        <p className="font-medium mb-1">冲突车辆：</p>
+                        <ul className="space-y-1 ml-2">
+                          {conflictInfo.conflictVehicles.map((v) => (
+                            <li key={v.id}>
+                              <span className="font-medium">{v.plateNumber}</span>
+                              <span className="text-yellow-600">（{v.brand} {v.model}）</span>
+                              {v.conflictOrders && v.conflictOrders.length > 0 && (
+                                <div className="ml-4 text-xs text-yellow-600 mt-0.5">
+                                  与订单 {v.conflictOrders.map(o => `${o.orderNo}(${o.timeRange})`).join('、')} 时间重叠
+                                </div>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
                     )}
                     {conflictInfo.conflictDrivers.length > 0 && (
-                      <p>
-                        冲突司机：
-                        {conflictInfo.conflictDrivers.map((d) => d.name).join('、')}
-                      </p>
+                      <div>
+                        <p className="font-medium mb-1">冲突司机：</p>
+                        <p className="ml-2">
+                          {conflictInfo.conflictDrivers.map((d) => d.name).join('、')}
+                        </p>
+                      </div>
                     )}
                   </div>
                 </div>

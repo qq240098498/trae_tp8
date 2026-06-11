@@ -186,17 +186,29 @@
       "groomPhone": "13900139007",
       "bridePhone": "13900139008",
       "weddingDate": "2026-06-12",
-      "departureTime": "07:00",
+      "departureTime": "11:00",
       "returnTime": "16:00",
       "pickupAddress": "北京市海淀区学院路15号",
       "ceremonyAddress": "北京市朝阳区望京街8号",
       "dropoffAddress": "北京市海淀区学院路15号",
-      "status": "pending",
+      "status": "scheduled",
       "totalAmount": 6200,
       "depositAmount": 2000,
       "remark": "需要白色车队",
       "createdAt": "2026-06-10T13:21:36.222Z",
-      "updatedAt": "2026-06-10T13:21:36.222Z"
+      "updatedAt": "2026-06-11T03:07:36.603Z",
+      "vehicles": [
+        {
+          "id": 9,
+          "vehicleId": 2,
+          "driverId": 3,
+          "role": "lead",
+          "sequence": 1,
+          "estimatedMileage": 50,
+          "serviceFee": 1000,
+          "driverFee": 500
+        }
+      ]
     },
     {
       "id": 5,
@@ -205,18 +217,30 @@
       "brideName": "黄雪",
       "groomPhone": "13900139009",
       "bridePhone": "13900139010",
-      "weddingDate": "2026-06-15",
+      "weddingDate": "2026-06-12",
       "departureTime": "09:00",
-      "returnTime": "20:00",
+      "returnTime": "10:00",
       "pickupAddress": "北京市通州区新华大街1号",
       "ceremonyAddress": "北京市昌平区回龙观西大街8号",
       "dropoffAddress": "北京市通州区新华大街1号",
-      "status": "pending",
+      "status": "scheduled",
       "totalAmount": 7500,
       "depositAmount": 2500,
       "remark": "",
       "createdAt": "2026-06-10T13:21:36.222Z",
-      "updatedAt": "2026-06-10T13:21:36.222Z"
+      "updatedAt": "2026-06-11T03:07:26.670Z",
+      "vehicles": [
+        {
+          "id": 10,
+          "vehicleId": 4,
+          "driverId": 2,
+          "role": "lead",
+          "sequence": 1,
+          "estimatedMileage": 50,
+          "serviceFee": 1000,
+          "driverFee": 500
+        }
+      ]
     }
   ],
   "orderVehicles": [
@@ -328,6 +352,28 @@
       "driverFee": 600,
       "departureTime": "2026-06-11T02:06:45.042Z",
       "returnTime": "2026-06-11T02:06:57.199Z"
+    },
+    {
+      "id": 9,
+      "orderId": 4,
+      "vehicleId": 2,
+      "driverId": 3,
+      "sequence": 1,
+      "role": "lead",
+      "estimatedMileage": 50,
+      "serviceFee": 1000,
+      "driverFee": 500
+    },
+    {
+      "id": 10,
+      "orderId": 5,
+      "vehicleId": 4,
+      "driverId": 2,
+      "sequence": 1,
+      "role": "lead",
+      "estimatedMileage": 50,
+      "serviceFee": 1000,
+      "driverFee": 500
     }
   ],
   "settlements": [

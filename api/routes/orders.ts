@@ -3,6 +3,20 @@ import { db, type Order, type OrderVehicle } from '../db.js'
 
 const router = Router()
 
+function getTimeRange(order: { weddingDate: string; departureTime: string; returnTime: string }) {
+  return {
+    start: new Date(`${order.weddingDate}T${order.departureTime}:00`).getTime(),
+    end: new Date(`${order.weddingDate}T${order.returnTime}:00`).getTime(),
+  }
+}
+
+function isTimeOverlap(
+  range1: { start: number; end: number },
+  range2: { start: number; end: number },
+): boolean {
+  return range1.start < range2.end && range2.start < range1.end
+}
+
 router.get('/', (req: Request, res: Response): void => {
   const database = db.read()
   const { status, dateFrom, dateTo, keyword } = req.query
@@ -99,37 +113,69 @@ router.get('/:id/vehicles', (req: Request, res: Response): void => {
 
 router.post('/check-conflict', (req: Request, res: Response): void => {
   const database = db.read()
-  const { weddingDate, vehicleIds, driverIds, excludeOrderId } = req.body
+  const { weddingDate, departureTime, returnTime, vehicleIds, driverIds, excludeOrderId } = req.body
+
+  if (!weddingDate || !departureTime || !returnTime) {
+    res.status(400).json({
+      success: false,
+      error: '请提供日期和时间段',
+    })
+    return
+  }
+
+  const newOrderRange = getTimeRange({
+    weddingDate,
+    departureTime,
+    returnTime,
+  })
 
   const dateOrders = database.orders.filter(
     o => o.weddingDate === weddingDate && o.status !== 'cancelled' && (excludeOrderId ? o.id !== excludeOrderId : true),
   )
 
-  const dateOrderIds = dateOrders.map(o => o.id)
+  const conflictOrderIds: number[] = []
+  for (const order of dateOrders) {
+    const existingRange = getTimeRange(order)
+    if (isTimeOverlap(newOrderRange, existingRange)) {
+      conflictOrderIds.push(order.id)
+    }
+  }
+
   const dateOrderVehicles = database.orderVehicles.filter(ov =>
-    dateOrderIds.includes(ov.orderId),
+    conflictOrderIds.includes(ov.orderId),
   )
 
   const conflictVehicles: number[] = []
   const conflictDrivers: number[] = []
+  const conflictInfoMap: Record<number, { orderId: number; orderNo: string; timeRange: string }[]> = {}
 
-  if (vehicleIds && Array.isArray(vehicleIds)) {
-    for (const vehicleId of vehicleIds) {
-      if (dateOrderVehicles.some(ov => ov.vehicleId === vehicleId)) {
-        conflictVehicles.push(vehicleId)
+  for (const ov of dateOrderVehicles) {
+    const order = database.orders.find(o => o.id === ov.orderId)
+    const timeInfo = order ? `${order.departureTime}-${order.returnTime}` : ''
+    const orderInfo = order ? { orderId: order.id, orderNo: order.orderNo, timeRange: timeInfo } : null
+
+    if (vehicleIds && Array.isArray(vehicleIds) && vehicleIds.includes(ov.vehicleId)) {
+      if (!conflictVehicles.includes(ov.vehicleId)) {
+        conflictVehicles.push(ov.vehicleId)
+      }
+      if (orderInfo) {
+        if (!conflictInfoMap[ov.vehicleId]) conflictInfoMap[ov.vehicleId] = []
+        conflictInfoMap[ov.vehicleId].push(orderInfo)
+      }
+    }
+
+    if (driverIds && Array.isArray(driverIds) && driverIds.includes(ov.driverId)) {
+      if (!conflictDrivers.includes(ov.driverId)) {
+        conflictDrivers.push(ov.driverId)
       }
     }
   }
 
-  if (driverIds && Array.isArray(driverIds)) {
-    for (const driverId of driverIds) {
-      if (dateOrderVehicles.some(ov => ov.driverId === driverId)) {
-        conflictDrivers.push(driverId)
-      }
-    }
-  }
+  const conflictVehicleDetails = conflictVehicles.map(id => {
+    const vehicle = database.vehicles.find(v => v.id === id)
+    return vehicle ? { ...vehicle, conflictOrders: conflictInfoMap[id] || [] } : null
+  }).filter(Boolean)
 
-  const conflictVehicleDetails = conflictVehicles.map(id => database.vehicles.find(v => v.id === id)).filter(Boolean)
   const conflictDriverDetails = conflictDrivers.map(id => database.drivers.find(d => d.id === id)).filter(Boolean)
 
   res.json({
@@ -144,7 +190,7 @@ router.post('/check-conflict', (req: Request, res: Response): void => {
 
 router.get('/schedule/available', (req: Request, res: Response): void => {
   const database = db.read()
-  const { date } = req.query
+  const { date, departureTime, returnTime } = req.query
 
   if (!date || typeof date !== 'string') {
     res.status(400).json({
@@ -154,12 +200,28 @@ router.get('/schedule/available', (req: Request, res: Response): void => {
     return
   }
 
+  const depTime = (departureTime as string) || '00:00'
+  const retTime = (returnTime as string) || '23:59'
+  const queryRange = getTimeRange({
+    weddingDate: date,
+    departureTime: depTime,
+    returnTime: retTime,
+  })
+
   const dateOrders = database.orders.filter(
     o => o.weddingDate === date && o.status !== 'cancelled',
   )
-  const dateOrderIds = dateOrders.map(o => o.id)
+
+  const conflictOrderIds: number[] = []
+  for (const order of dateOrders) {
+    const existingRange = getTimeRange(order)
+    if (isTimeOverlap(queryRange, existingRange)) {
+      conflictOrderIds.push(order.id)
+    }
+  }
+
   const dateOrderVehicles = database.orderVehicles.filter(ov =>
-    dateOrderIds.includes(ov.orderId),
+    conflictOrderIds.includes(ov.orderId),
   )
 
   const usedVehicleIds = new Set(dateOrderVehicles.map(ov => ov.vehicleId))
