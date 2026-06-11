@@ -81,9 +81,9 @@ export default function RepairOrders() {
   })
 
   useEffect(() => {
-    fetchRepairOrders({ status: statusFilter, vehicleId: vehicleFilter, keyword })
+    fetchRepairOrders()
     fetchVehicles({ status: 'all' })
-  }, [fetchRepairOrders, fetchVehicles, statusFilter, vehicleFilter, keyword])
+  }, [fetchRepairOrders, fetchVehicles])
 
   const handleReport = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -99,7 +99,7 @@ export default function RepairOrders() {
       await addRepairOrder(reportForm)
       setShowReportModal(false)
       resetReportForm()
-      fetchRepairOrders({ status: statusFilter, vehicleId: vehicleFilter, keyword })
+      fetchRepairOrders()
       alert('报修成功')
     } catch (err) {
       alert((err as Error).message)
@@ -127,7 +127,7 @@ export default function RepairOrders() {
       await updateRepairOrder(editingOrder.id, reportForm)
       setShowReportModal(false)
       resetReportForm()
-      fetchRepairOrders({ status: statusFilter, vehicleId: vehicleFilter, keyword })
+      fetchRepairOrders()
       alert('更新成功')
     } catch (err) {
       alert((err as Error).message)
@@ -138,7 +138,7 @@ export default function RepairOrders() {
     if (window.confirm('确定要删除该维修工单吗？')) {
       try {
         await deleteRepairOrder(id)
-        fetchRepairOrders({ status: statusFilter, vehicleId: vehicleFilter, keyword })
+      fetchRepairOrders()
       } catch (err) {
         alert((err as Error).message)
       }
@@ -162,7 +162,7 @@ export default function RepairOrders() {
       if (!selectedOrder) return
       await assignRepairOrder(selectedOrder.id, assignForm)
       setShowAssignModal(false)
-      fetchRepairOrders({ status: statusFilter, vehicleId: vehicleFilter, keyword })
+      fetchRepairOrders()
       alert('派修成功')
     } catch (err) {
       alert((err as Error).message)
@@ -173,7 +173,7 @@ export default function RepairOrders() {
     if (!window.confirm('确认开始维修吗？')) return
     try {
       await startRepairOrder(order.id)
-      fetchRepairOrders({ status: statusFilter, vehicleId: vehicleFilter, keyword })
+      fetchRepairOrders()
       alert('已开始维修')
     } catch (err) {
       alert((err as Error).message)
@@ -197,7 +197,7 @@ export default function RepairOrders() {
       if (!selectedOrder) return
       await completeRepairOrder(selectedOrder.id, completeForm)
       setShowCompleteModal(false)
-      fetchRepairOrders({ status: statusFilter, vehicleId: vehicleFilter, keyword })
+      fetchRepairOrders()
       alert('维修完成')
     } catch (err) {
       alert((err as Error).message)
@@ -208,7 +208,7 @@ export default function RepairOrders() {
     if (!window.confirm('确认取消该维修工单吗？')) return
     try {
       await cancelRepairOrder(order.id)
-      fetchRepairOrders({ status: statusFilter, vehicleId: vehicleFilter, keyword })
+      fetchRepairOrders()
       alert('已取消')
     } catch (err) {
       alert((err as Error).message)
@@ -236,6 +236,37 @@ export default function RepairOrders() {
   const getVehicleInfo = (vehicleId: number): Vehicle | undefined => {
     return vehicles.find((v) => v.id === vehicleId)
   }
+
+  const filteredOrders = repairOrders.filter((order) => {
+    const vehicle = getVehicleInfo(order.vehicleId)
+    const plateNumber = order.vehiclePlate || vehicle?.plateNumber || ''
+
+    if (statusFilter !== 'all' && order.status !== statusFilter) {
+      return false
+    }
+
+    if (vehicleFilter !== 'all' && String(order.vehicleId) !== String(vehicleFilter)) {
+      return false
+    }
+
+    if (keyword.trim()) {
+      const kw = keyword.trim().toLowerCase()
+      const matchFields = [
+        order.orderNo,
+        order.title,
+        order.reporter,
+        plateNumber,
+        order.description,
+        order.assignee,
+        order.serviceProvider,
+      ].filter(Boolean).map((s) => String(s).toLowerCase())
+      if (!matchFields.some((s) => s.includes(kw))) {
+        return false
+      }
+    }
+
+    return true
+  })
 
   const stats = {
     pending: repairOrders.filter((o) => o.status === 'pending').length,
@@ -378,7 +409,7 @@ export default function RepairOrders() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 text-sm">
-            {repairOrders.map((order) => {
+            {filteredOrders.map((order) => {
               const statusInfo = REPAIR_STATUS_MAP[order.status]
               const typeInfo = REPAIR_TYPE_MAP[order.repairType]
               const priorityInfo = REPAIR_PRIORITY_MAP[order.priority]
@@ -523,7 +554,7 @@ export default function RepairOrders() {
                 </tr>
               )
             })}
-            {repairOrders.length === 0 && (
+            {filteredOrders.length === 0 && (
               <tr>
                 <td colSpan={7} className="px-6 py-12 text-center text-gray-400">
                   暂无维修工单数据

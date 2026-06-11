@@ -96,10 +96,10 @@
       "decorationType": "标准鲜花装饰",
       "seatCount": 5,
       "purchaseYear": 2022,
-      "status": "available",
+      "status": "maintenance",
       "remark": "",
       "createdAt": "2026-06-10T13:21:36.222Z",
-      "updatedAt": "2026-06-10T13:21:36.222Z"
+      "updatedAt": "2026-06-11T13:26:10.927Z"
     },
     {
       "id": 5,
@@ -743,29 +743,6 @@
   ],
   "repairOrders": [
     {
-      "id": 1,
-      "orderNo": "RX20260608001",
-      "vehicleId": 1,
-      "reportDate": "2026-06-08",
-      "reporter": "张师傅",
-      "repairType": "maintenance",
-      "priority": "normal",
-      "title": "常规保养",
-      "description": "车辆行驶25000公里，需要进行常规保养",
-      "status": "completed",
-      "assignee": "奔驰4S店",
-      "serviceProvider": "奔驰4S店",
-      "estimatedCost": 1500,
-      "actualCost": 1280,
-      "startDate": "2026-06-08",
-      "completeDate": "2026-06-08",
-      "mileage": 25000,
-      "repairItems": "更换机油、机滤，检查刹车系统，使用全合成机油",
-      "remark": "下次保养时间：2026-08-15",
-      "createdAt": "2026-06-08T09:00:00.000Z",
-      "updatedAt": "2026-06-08T16:30:00.000Z"
-    },
-    {
       "id": 2,
       "orderNo": "RX20260610001",
       "vehicleId": 2,
@@ -796,7 +773,7 @@
       "priority": "emergency",
       "title": "事故维修",
       "description": "车辆右前保险杠刮擦，需要钣金喷漆",
-      "status": "assigned",
+      "status": "completed",
       "assignee": "李维修",
       "serviceProvider": "奥迪4S店",
       "estimatedCost": 2500,
@@ -804,7 +781,10 @@
       "repairItems": "保险杠钣金、喷漆、抛光",
       "remark": "6月15日前需修复完毕，有订单",
       "createdAt": "2026-06-11T08:30:00.000Z",
-      "updatedAt": "2026-06-11T09:00:00.000Z"
+      "updatedAt": "2026-06-11T13:23:06.753Z",
+      "startDate": "2026-06-11",
+      "actualCost": 1421412,
+      "completeDate": "2026-06-11"
     },
     {
       "id": 4,
@@ -816,12 +796,16 @@
       "priority": "normal",
       "title": "空调不制冷",
       "description": "空调开启后出风不冷，需要检查制冷剂",
-      "status": "pending",
+      "status": "assigned",
       "mileage": 38000,
       "repairItems": "检查空调系统，必要时补充制冷剂",
       "remark": "",
       "createdAt": "2026-06-11T11:00:00.000Z",
-      "updatedAt": "2026-06-11T11:00:00.000Z"
+      "updatedAt": "2026-06-11T13:26:10.927Z",
+      "assignee": "张三把",
+      "serviceProvider": "24",
+      "estimatedCost": 1000,
+      "startDate": "2026-06-11"
     }
   ]
 }
