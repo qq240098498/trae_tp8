@@ -257,6 +257,63 @@ router.post('/', (req: Request, res: Response): void => {
   const database = db.read()
   const body = req.body as Partial<Order> & { vehicles?: Array<Partial<OrderVehicle>> }
 
+  const flowerPackageIds = body.flowerPackageIds || []
+  const carDecorationIds = body.carDecorationIds || []
+
+  for (const pid of flowerPackageIds) {
+    const pkg = database.flowerPackages.find(p => p.id === pid)
+    if (!pkg) {
+      res.status(400).json({
+        success: false,
+        error: `鲜花套餐ID ${pid} 不存在`,
+      })
+      return
+    }
+    const available = pkg.stock - pkg.usedStock
+    if (available < 1) {
+      res.status(400).json({
+        success: false,
+        error: `鲜花套餐「${pkg.name}」库存不足，剩余 ${available} 份`,
+      })
+      return
+    }
+  }
+
+  for (const did of carDecorationIds) {
+    const dec = database.carDecorations.find(d => d.id === did)
+    if (!dec) {
+      res.status(400).json({
+        success: false,
+        error: `婚车装饰ID ${did} 不存在`,
+      })
+      return
+    }
+    const available = dec.stock - dec.usedStock
+    if (available < 1) {
+      res.status(400).json({
+        success: false,
+        error: `婚车装饰「${dec.name}」库存不足，剩余 ${available} 份`,
+      })
+      return
+    }
+  }
+
+  for (const pid of flowerPackageIds) {
+    const idx = database.flowerPackages.findIndex(p => p.id === pid)
+    if (idx !== -1) {
+      database.flowerPackages[idx].usedStock += 1
+      database.flowerPackages[idx].updatedAt = new Date().toISOString()
+    }
+  }
+
+  for (const did of carDecorationIds) {
+    const idx = database.carDecorations.findIndex(d => d.id === did)
+    if (idx !== -1) {
+      database.carDecorations[idx].usedStock += 1
+      database.carDecorations[idx].updatedAt = new Date().toISOString()
+    }
+  }
+
   const orderNo = db.generateOrderNo(body.weddingDate || new Date().toISOString().split('T')[0])
 
   const newOrder: Order = {
@@ -322,6 +379,85 @@ router.put('/:id', (req: Request, res: Response): void => {
       error: '订单不存在',
     })
     return
+  }
+
+  const oldFlowerIds = database.orders[index].flowerPackageIds || []
+  const oldDecoIds = database.orders[index].carDecorationIds || []
+  const newFlowerIds = body.flowerPackageIds || oldFlowerIds
+  const newDecoIds = body.carDecorationIds || oldDecoIds
+
+  if (body.status === 'cancelled' && database.orders[index].status !== 'cancelled') {
+    for (const pid of oldFlowerIds) {
+      const idx = database.flowerPackages.findIndex(p => p.id === pid)
+      if (idx !== -1 && database.flowerPackages[idx].usedStock > 0) {
+        database.flowerPackages[idx].usedStock -= 1
+        database.flowerPackages[idx].updatedAt = new Date().toISOString()
+      }
+    }
+    for (const did of oldDecoIds) {
+      const idx = database.carDecorations.findIndex(d => d.id === did)
+      if (idx !== -1 && database.carDecorations[idx].usedStock > 0) {
+        database.carDecorations[idx].usedStock -= 1
+        database.carDecorations[idx].updatedAt = new Date().toISOString()
+      }
+    }
+  } else if (database.orders[index].status !== 'cancelled') {
+    const addedFlowers = newFlowerIds.filter(pid => !oldFlowerIds.includes(pid))
+    const removedFlowers = oldFlowerIds.filter(pid => !newFlowerIds.includes(pid))
+    const addedDecos = newDecoIds.filter(did => !oldDecoIds.includes(did))
+    const removedDecos = oldDecoIds.filter(did => !newDecoIds.includes(did))
+
+    for (const pid of addedFlowers) {
+      const pkg = database.flowerPackages.find(p => p.id === pid)
+      if (!pkg) {
+        res.status(400).json({ success: false, error: `鲜花套餐ID ${pid} 不存在` })
+        return
+      }
+      if (pkg.stock - pkg.usedStock < 1) {
+        res.status(400).json({ success: false, error: `鲜花套餐「${pkg.name}」库存不足，剩余 ${pkg.stock - pkg.usedStock} 份` })
+        return
+      }
+    }
+    for (const did of addedDecos) {
+      const dec = database.carDecorations.find(d => d.id === did)
+      if (!dec) {
+        res.status(400).json({ success: false, error: `婚车装饰ID ${did} 不存在` })
+        return
+      }
+      if (dec.stock - dec.usedStock < 1) {
+        res.status(400).json({ success: false, error: `婚车装饰「${dec.name}」库存不足，剩余 ${dec.stock - dec.usedStock} 份` })
+        return
+      }
+    }
+
+    for (const pid of addedFlowers) {
+      const idx = database.flowerPackages.findIndex(p => p.id === pid)
+      if (idx !== -1) {
+        database.flowerPackages[idx].usedStock += 1
+        database.flowerPackages[idx].updatedAt = new Date().toISOString()
+      }
+    }
+    for (const pid of removedFlowers) {
+      const idx = database.flowerPackages.findIndex(p => p.id === pid)
+      if (idx !== -1 && database.flowerPackages[idx].usedStock > 0) {
+        database.flowerPackages[idx].usedStock -= 1
+        database.flowerPackages[idx].updatedAt = new Date().toISOString()
+      }
+    }
+    for (const did of addedDecos) {
+      const idx = database.carDecorations.findIndex(d => d.id === did)
+      if (idx !== -1) {
+        database.carDecorations[idx].usedStock += 1
+        database.carDecorations[idx].updatedAt = new Date().toISOString()
+      }
+    }
+    for (const did of removedDecos) {
+      const idx = database.carDecorations.findIndex(d => d.id === did)
+      if (idx !== -1 && database.carDecorations[idx].usedStock > 0) {
+        database.carDecorations[idx].usedStock -= 1
+        database.carDecorations[idx].updatedAt = new Date().toISOString()
+      }
+    }
   }
 
   database.orders[index] = {
@@ -398,6 +534,24 @@ router.delete('/:id', (req: Request, res: Response): void => {
     return
   }
 
+  const order = database.orders[index]
+  if (order.status !== 'cancelled') {
+    for (const pid of (order.flowerPackageIds || [])) {
+      const idx = database.flowerPackages.findIndex(p => p.id === pid)
+      if (idx !== -1 && database.flowerPackages[idx].usedStock > 0) {
+        database.flowerPackages[idx].usedStock -= 1
+        database.flowerPackages[idx].updatedAt = new Date().toISOString()
+      }
+    }
+    for (const did of (order.carDecorationIds || [])) {
+      const idx = database.carDecorations.findIndex(d => d.id === did)
+      if (idx !== -1 && database.carDecorations[idx].usedStock > 0) {
+        database.carDecorations[idx].usedStock -= 1
+        database.carDecorations[idx].updatedAt = new Date().toISOString()
+      }
+    }
+  }
+
   const orderVehicles = database.orderVehicles.filter(ov => ov.orderId === id)
   orderVehicles.forEach(ov => {
     const idx = database.orderVehicles.findIndex(v => v.id === ov.id)
@@ -425,6 +579,24 @@ router.patch('/:id/status', (req: Request, res: Response): void => {
       error: '订单不存在',
     })
     return
+  }
+
+  const oldStatus = database.orders[index].status
+  if (status === 'cancelled' && oldStatus !== 'cancelled') {
+    for (const pid of (database.orders[index].flowerPackageIds || [])) {
+      const idx = database.flowerPackages.findIndex(p => p.id === pid)
+      if (idx !== -1 && database.flowerPackages[idx].usedStock > 0) {
+        database.flowerPackages[idx].usedStock -= 1
+        database.flowerPackages[idx].updatedAt = new Date().toISOString()
+      }
+    }
+    for (const did of (database.orders[index].carDecorationIds || [])) {
+      const idx = database.carDecorations.findIndex(d => d.id === did)
+      if (idx !== -1 && database.carDecorations[idx].usedStock > 0) {
+        database.carDecorations[idx].usedStock -= 1
+        database.carDecorations[idx].updatedAt = new Date().toISOString()
+      }
+    }
   }
 
   database.orders[index].status = status

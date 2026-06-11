@@ -35,6 +35,8 @@ export interface FlowerPackage {
   price: number
   items: string
   imageUrl: string
+  stock: number
+  usedStock: number
   status: 'active' | 'inactive'
   remark: string
   createdAt: string
@@ -49,6 +51,8 @@ export interface CarDecoration {
   price: number
   applicableVehicleTypes: string
   imageUrl: string
+  stock: number
+  usedStock: number
   status: 'active' | 'inactive'
   remark: string
   createdAt: string

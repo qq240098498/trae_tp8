@@ -62,6 +62,8 @@ router.post('/', (req: Request, res: Response): void => {
     price: body.price || 0,
     applicableVehicleTypes: body.applicableVehicleTypes || '',
     imageUrl: body.imageUrl || '',
+    stock: body.stock || 0,
+    usedStock: 0,
     status: body.status || 'active',
     remark: body.remark || '',
     createdAt: new Date().toISOString(),
@@ -95,6 +97,7 @@ router.put('/:id', (req: Request, res: Response): void => {
     ...database.carDecorations[index],
     ...body,
     id,
+    usedStock: database.carDecorations[index].usedStock,
     updatedAt: new Date().toISOString(),
   }
 

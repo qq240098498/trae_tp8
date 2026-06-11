@@ -59,6 +59,8 @@ router.post('/', (req: Request, res: Response): void => {
     price: body.price || 0,
     items: body.items || '',
     imageUrl: body.imageUrl || '',
+    stock: body.stock || 0,
+    usedStock: 0,
     status: body.status || 'active',
     remark: body.remark || '',
     createdAt: new Date().toISOString(),
@@ -92,6 +94,7 @@ router.put('/:id', (req: Request, res: Response): void => {
     ...database.flowerPackages[index],
     ...body,
     id,
+    usedStock: database.flowerPackages[index].usedStock,
     updatedAt: new Date().toISOString(),
   }
 

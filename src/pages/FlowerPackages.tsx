@@ -16,6 +16,7 @@ export default function FlowerPackages() {
     price: 0,
     items: '',
     imageUrl: '',
+    stock: 0,
     status: 'active' as 'active' | 'inactive',
     remark: '',
   })
@@ -32,6 +33,7 @@ export default function FlowerPackages() {
       price: 0,
       items: '',
       imageUrl: '',
+      stock: 0,
       status: 'active',
       remark: '',
     })
@@ -46,6 +48,7 @@ export default function FlowerPackages() {
       price: pkg.price,
       items: pkg.items,
       imageUrl: pkg.imageUrl,
+      stock: pkg.stock,
       status: pkg.status,
       remark: pkg.remark,
     })
@@ -135,6 +138,7 @@ export default function FlowerPackages() {
               <th className="px-6 py-4 font-medium">套餐名称</th>
               <th className="px-6 py-4 font-medium">描述</th>
               <th className="px-6 py-4 font-medium">价格</th>
+              <th className="px-6 py-4 font-medium">库存</th>
               <th className="px-6 py-4 font-medium">包含花材</th>
               <th className="px-6 py-4 font-medium">状态</th>
               <th className="px-6 py-4 text-right font-medium">操作</th>
@@ -156,6 +160,17 @@ export default function FlowerPackages() {
                   <td className="px-6 py-4 text-gray-600">{pkg.description || '-'}</td>
                   <td className="px-6 py-4">
                     <span className="font-semibold text-rose-600">¥{pkg.price.toLocaleString()}</span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex flex-col">
+                      <span className={cn(
+                        'font-medium',
+                        (pkg.stock - pkg.usedStock) <= 0 ? 'text-red-600' : (pkg.stock - pkg.usedStock) <= 2 ? 'text-amber-600' : 'text-green-600'
+                      )}>
+                        剩 {pkg.stock - pkg.usedStock}
+                      </span>
+                      <span className="text-xs text-gray-400">共 {pkg.stock} / 已用 {pkg.usedStock}</span>
+                    </div>
                   </td>
                   <td className="px-6 py-4 text-gray-600">{pkg.items || '-'}</td>
                   <td className="px-6 py-4">
@@ -192,7 +207,7 @@ export default function FlowerPackages() {
             })}
             {flowerPackages.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-6 py-12 text-center text-gray-400">
+                <td colSpan={7} className="px-6 py-12 text-center text-gray-400">
                   暂无套餐数据
                 </td>
               </tr>
@@ -246,6 +261,19 @@ export default function FlowerPackages() {
                   min="0"
                   value={formData.price}
                   onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  库存数量 <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  value={formData.stock}
+                  onChange={(e) => setFormData({ ...formData, stock: Number(e.target.value) })}
                   className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500"
                   required
                 />

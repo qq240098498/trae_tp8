@@ -11,6 +11,7 @@ const initialFormData = {
   price: 0,
   applicableVehicleTypes: '',
   imageUrl: '',
+  stock: 0,
   status: 'active' as 'active' | 'inactive',
   remark: '',
 }
@@ -43,6 +44,7 @@ export default function CarDecorations() {
       price: item.price,
       applicableVehicleTypes: item.applicableVehicleTypes,
       imageUrl: item.imageUrl,
+      stock: item.stock,
       status: item.status,
       remark: item.remark,
     })
@@ -143,6 +145,7 @@ export default function CarDecorations() {
               <th className="px-6 py-4 font-medium">装饰类型</th>
               <th className="px-6 py-4 font-medium">描述</th>
               <th className="px-6 py-4 font-medium">价格</th>
+              <th className="px-6 py-4 font-medium">库存</th>
               <th className="px-6 py-4 font-medium">适用车型</th>
               <th className="px-6 py-4 font-medium">状态</th>
               <th className="px-6 py-4 text-right font-medium">操作</th>
@@ -171,6 +174,17 @@ export default function CarDecorations() {
                     <span className="font-semibold text-rose-600">
                       ¥{item.price.toLocaleString()}
                     </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex flex-col">
+                      <span className={cn(
+                        'font-medium',
+                        (item.stock - item.usedStock) <= 0 ? 'text-red-600' : (item.stock - item.usedStock) <= 2 ? 'text-amber-600' : 'text-green-600'
+                      )}>
+                        剩 {item.stock - item.usedStock}
+                      </span>
+                      <span className="text-xs text-gray-400">共 {item.stock} / 已用 {item.usedStock}</span>
+                    </div>
                   </td>
                   <td className="px-6 py-4 text-gray-600">
                     {item.applicableVehicleTypes || '-'}
@@ -207,7 +221,7 @@ export default function CarDecorations() {
             })}
             {carDecorations.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-6 py-12 text-center text-gray-400">
+                <td colSpan={8} className="px-6 py-12 text-center text-gray-400">
                   暂无装饰数据
                 </td>
               </tr>
@@ -279,6 +293,19 @@ export default function CarDecorations() {
                     min="0"
                     value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
+                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                    库存数量 <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={formData.stock}
+                    onChange={(e) => setFormData({ ...formData, stock: Number(e.target.value) })}
                     className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500"
                     required
                   />

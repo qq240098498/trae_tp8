@@ -945,31 +945,48 @@ export default function Orders() {
                       <div className="grid grid-cols-1 gap-3">
                         {flowerPackages.map((pkg) => {
                           const isSelected = selectedFlowerPackageIds.includes(pkg.id)
+                          const availableStock = (pkg.stock || 0) - (pkg.usedStock || 0)
+                          const outOfStock = availableStock <= 0
+                          const lowStock = availableStock > 0 && availableStock <= 2
+                          const isDisabled = outOfStock || pkg.status !== 'active'
                           return (
                             <label
                               key={pkg.id}
                               className={cn(
-                                'flex items-start gap-3 rounded-lg border p-4 cursor-pointer transition-colors',
-                                isSelected
-                                  ? 'border-rose-300 bg-rose-50'
-                                  : 'border-gray-200 hover:border-gray-300',
+                                'flex items-start gap-3 rounded-lg border p-4 transition-colors',
+                                isDisabled
+                                  ? 'border-gray-100 bg-gray-50 cursor-not-allowed opacity-60'
+                                  : isSelected
+                                    ? 'border-rose-300 bg-rose-50 cursor-pointer'
+                                    : 'border-gray-200 hover:border-gray-300 cursor-pointer',
                               )}
                             >
                               <input
                                 type="checkbox"
                                 checked={isSelected}
+                                disabled={isDisabled}
                                 onChange={(e) => {
+                                  if (isDisabled) return
                                   if (e.target.checked) {
                                     setSelectedFlowerPackageIds([...selectedFlowerPackageIds, pkg.id])
                                   } else {
                                     setSelectedFlowerPackageIds(selectedFlowerPackageIds.filter(id => id !== pkg.id))
                                   }
                                 }}
-                                className="mt-1 h-4 w-4 rounded border-gray-300 text-rose-600 focus:ring-rose-500"
+                                className="mt-1 h-4 w-4 rounded border-gray-300 text-rose-600 focus:ring-rose-500 disabled:cursor-not-allowed"
                               />
                               <div className="flex-1">
                                 <div className="flex items-center justify-between">
-                                  <span className="font-medium text-gray-800">{pkg.name}</span>
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-medium text-gray-800">{pkg.name}</span>
+                                    {outOfStock ? (
+                                      <span className="rounded bg-red-100 px-2 py-0.5 text-xs font-medium text-red-600">已售罄</span>
+                                    ) : lowStock ? (
+                                      <span className="rounded bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">仅剩 {availableStock} 份</span>
+                                    ) : (
+                                      <span className="rounded bg-green-50 px-2 py-0.5 text-xs font-medium text-green-600">库存 {availableStock}</span>
+                                    )}
+                                  </div>
                                   <span className="font-semibold text-rose-600">¥{pkg.price.toLocaleString()}</span>
                                 </div>
                                 <p className="mt-1 text-xs text-gray-500">{pkg.description}</p>
@@ -993,31 +1010,48 @@ export default function Orders() {
                       <div className="grid grid-cols-1 gap-3">
                         {carDecorations.map((dec) => {
                           const isSelected = selectedCarDecorationIds.includes(dec.id)
+                          const availableStock = (dec.stock || 0) - (dec.usedStock || 0)
+                          const outOfStock = availableStock <= 0
+                          const lowStock = availableStock > 0 && availableStock <= 2
+                          const isDisabled = outOfStock || dec.status !== 'active'
                           return (
                             <label
                               key={dec.id}
                               className={cn(
-                                'flex items-start gap-3 rounded-lg border p-4 cursor-pointer transition-colors',
-                                isSelected
-                                  ? 'border-rose-300 bg-rose-50'
-                                  : 'border-gray-200 hover:border-gray-300',
+                                'flex items-start gap-3 rounded-lg border p-4 transition-colors',
+                                isDisabled
+                                  ? 'border-gray-100 bg-gray-50 cursor-not-allowed opacity-60'
+                                  : isSelected
+                                    ? 'border-rose-300 bg-rose-50 cursor-pointer'
+                                    : 'border-gray-200 hover:border-gray-300 cursor-pointer',
                               )}
                             >
                               <input
                                 type="checkbox"
                                 checked={isSelected}
+                                disabled={isDisabled}
                                 onChange={(e) => {
+                                  if (isDisabled) return
                                   if (e.target.checked) {
                                     setSelectedCarDecorationIds([...selectedCarDecorationIds, dec.id])
                                   } else {
                                     setSelectedCarDecorationIds(selectedCarDecorationIds.filter(id => id !== dec.id))
                                   }
                                 }}
-                                className="mt-1 h-4 w-4 rounded border-gray-300 text-rose-600 focus:ring-rose-500"
+                                className="mt-1 h-4 w-4 rounded border-gray-300 text-rose-600 focus:ring-rose-500 disabled:cursor-not-allowed"
                               />
                               <div className="flex-1">
                                 <div className="flex items-center justify-between">
-                                  <span className="font-medium text-gray-800">{dec.name}</span>
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-medium text-gray-800">{dec.name}</span>
+                                    {outOfStock ? (
+                                      <span className="rounded bg-red-100 px-2 py-0.5 text-xs font-medium text-red-600">已售罄</span>
+                                    ) : lowStock ? (
+                                      <span className="rounded bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">仅剩 {availableStock} 份</span>
+                                    ) : (
+                                      <span className="rounded bg-green-50 px-2 py-0.5 text-xs font-medium text-green-600">库存 {availableStock}</span>
+                                    )}
+                                  </div>
                                   <span className="font-semibold text-rose-600">¥{dec.price.toLocaleString()}</span>
                                 </div>
                                 <div className="mt-1 flex items-center gap-2">
