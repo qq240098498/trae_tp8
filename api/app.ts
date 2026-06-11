@@ -17,6 +17,9 @@ import vehiclesRoutes from './routes/vehicles.js'
 import ordersRoutes from './routes/orders.js'
 import settlementsRoutes from './routes/settlements.js'
 import statsRoutes from './routes/stats.js'
+import maintenanceRoutes from './routes/maintenance.js'
+import insuranceRoutes from './routes/insurance.js'
+import inspectionRoutes from './routes/inspection.js'
 
 // for esm mode
 const __filename = fileURLToPath(import.meta.url)
@@ -40,6 +43,9 @@ app.use('/api/vehicles', vehiclesRoutes)
 app.use('/api/orders', ordersRoutes)
 app.use('/api/settlements', settlementsRoutes)
 app.use('/api/stats', statsRoutes)
+app.use('/api/maintenance', maintenanceRoutes)
+app.use('/api/insurance', insuranceRoutes)
+app.use('/api/inspection', inspectionRoutes)
 
 /**
  * health

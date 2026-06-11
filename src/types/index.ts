@@ -179,3 +179,76 @@ export const SETTLEMENT_STATUS_MAP: Record<string, { label: string; color: strin
   pending: { label: '待支付', color: 'bg-yellow-100 text-yellow-800' },
   paid: { label: '已支付', color: 'bg-green-100 text-green-800' },
 }
+
+export interface MaintenanceRecord {
+  id: number
+  vehicleId: number
+  vehiclePlate?: string
+  serviceDate: string
+  serviceType: string
+  serviceItem: string
+  mileage: number
+  cost: number
+  serviceProvider: string
+  nextServiceDate?: string
+  remark: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface InsuranceRecord {
+  id: number
+  vehicleId: number
+  vehiclePlate?: string
+  insuranceType: string
+  insuranceCompany: string
+  policyNo: string
+  startDate: string
+  endDate: string
+  premium: number
+  coverageAmount: number
+  remark: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface InspectionRecord {
+  id: number
+  vehicleId: number
+  vehiclePlate?: string
+  inspectionDate: string
+  inspectionResult: 'pass' | 'fail' | 'pending'
+  inspectionAgency: string
+  nextInspectionDate: string
+  cost: number
+  remark: string
+  createdAt: string
+  updatedAt: string
+}
+
+export const MAINTENANCE_TYPE_OPTIONS = [
+  '常规保养',
+  '机油更换',
+  '轮胎更换',
+  '刹车片更换',
+  '空调保养',
+  '大保养',
+  '钣金喷漆',
+  '其他维修',
+]
+
+export const INSURANCE_TYPE_OPTIONS = [
+  '交强险',
+  '商业险-车辆损失险',
+  '商业险-第三者责任险',
+  '商业险-车上人员责任险',
+  '商业险-全车盗抢险',
+  '商业险-综合险',
+  '车船税',
+]
+
+export const INSPECTION_RESULT_MAP: Record<string, { label: string; color: string }> = {
+  pass: { label: '合格', color: 'bg-green-100 text-green-800' },
+  fail: { label: '不合格', color: 'bg-red-100 text-red-800' },
+  pending: { label: '待检', color: 'bg-yellow-100 text-yellow-800' },
+}

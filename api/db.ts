@@ -86,12 +86,58 @@ export interface Settlement {
   createdAt: string
 }
 
+export interface MaintenanceRecord {
+  id: number
+  vehicleId: number
+  serviceDate: string
+  serviceType: string
+  serviceItem: string
+  mileage: number
+  cost: number
+  serviceProvider: string
+  nextServiceDate?: string
+  remark: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface InsuranceRecord {
+  id: number
+  vehicleId: number
+  insuranceType: string
+  insuranceCompany: string
+  policyNo: string
+  startDate: string
+  endDate: string
+  premium: number
+  coverageAmount: number
+  remark: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface InspectionRecord {
+  id: number
+  vehicleId: number
+  inspectionDate: string
+  inspectionResult: 'pass' | 'fail' | 'pending'
+  inspectionAgency: string
+  nextInspectionDate: string
+  cost: number
+  remark: string
+  createdAt: string
+  updatedAt: string
+}
+
 export interface Database {
   drivers: Driver[]
   vehicles: Vehicle[]
   orders: Order[]
   orderVehicles: OrderVehicle[]
   settlements: Settlement[]
+  maintenanceRecords: MaintenanceRecord[]
+  insuranceRecords: InsuranceRecord[]
+  inspectionRecords: InspectionRecord[]
 }
 
 function readDB(): Database {

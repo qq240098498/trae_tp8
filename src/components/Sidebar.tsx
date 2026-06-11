@@ -7,6 +7,7 @@ import {
   DollarSign,
   BarChart3,
   Flower2,
+  BookOpen,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -14,6 +15,7 @@ const menuItems = [
   { path: '/', label: '数据看板', icon: LayoutDashboard },
   { path: '/drivers', label: '司机管理', icon: Users },
   { path: '/vehicles', label: '车辆管理', icon: Car },
+  { path: '/vehicle-ledger', label: '车辆台账', icon: BookOpen },
   { path: '/orders', label: '订单管理', icon: Calendar },
   { path: '/settlements', label: '结算管理', icon: DollarSign },
   { path: '/statistics', label: '统计分析', icon: BarChart3 },

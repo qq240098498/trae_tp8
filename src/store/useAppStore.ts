@@ -12,6 +12,9 @@ import type {
   VehicleRanking,
   VehicleTypeDistribution,
   RevenueSummary,
+  MaintenanceRecord,
+  InsuranceRecord,
+  InspectionRecord,
 } from '@/types'
 import { api } from '@/services/api'
 
@@ -20,6 +23,9 @@ interface AppState {
   vehicles: Vehicle[]
   orders: Order[]
   settlements: Settlement[]
+  maintenanceRecords: MaintenanceRecord[]
+  insuranceRecords: InsuranceRecord[]
+  inspectionRecords: InspectionRecord[]
   stats: {
     overview: StatsOverview | null
     monthlyData: MonthlyData[]
@@ -36,6 +42,9 @@ interface AppState {
   fetchVehicles: (params?: { status?: string; vehicleType?: string; keyword?: string }) => Promise<void>
   fetchOrders: (params?: { status?: string; dateFrom?: string; dateTo?: string; keyword?: string }) => Promise<void>
   fetchSettlements: (params?: { status?: string; dateFrom?: string; dateTo?: string }) => Promise<void>
+  fetchMaintenanceRecords: (params?: { vehicleId?: string | number; keyword?: string }) => Promise<void>
+  fetchInsuranceRecords: (params?: { vehicleId?: string | number; keyword?: string }) => Promise<void>
+  fetchInspectionRecords: (params?: { vehicleId?: string | number; keyword?: string; result?: string }) => Promise<void>
   fetchStatsOverview: () => Promise<void>
   fetchStatsMonthly: () => Promise<void>
   fetchStatsStatus: () => Promise<void>
@@ -52,6 +61,18 @@ interface AppState {
   addVehicle: (data: Partial<Vehicle>) => Promise<Vehicle>
   updateVehicle: (id: number, data: Partial<Vehicle>) => Promise<Vehicle>
   deleteVehicle: (id: number) => Promise<void>
+
+  addMaintenanceRecord: (data: Partial<MaintenanceRecord>) => Promise<MaintenanceRecord>
+  updateMaintenanceRecord: (id: number, data: Partial<MaintenanceRecord>) => Promise<MaintenanceRecord>
+  deleteMaintenanceRecord: (id: number) => Promise<void>
+
+  addInsuranceRecord: (data: Partial<InsuranceRecord>) => Promise<InsuranceRecord>
+  updateInsuranceRecord: (id: number, data: Partial<InsuranceRecord>) => Promise<InsuranceRecord>
+  deleteInsuranceRecord: (id: number) => Promise<void>
+
+  addInspectionRecord: (data: Partial<InspectionRecord>) => Promise<InspectionRecord>
+  updateInspectionRecord: (id: number, data: Partial<InspectionRecord>) => Promise<InspectionRecord>
+  deleteInspectionRecord: (id: number) => Promise<void>
 
   addOrder: (data: Partial<Order> & { vehicles?: Array<Partial<import('@/types').OrderVehicle>> }) => Promise<Order>
   updateOrder: (
@@ -73,6 +94,9 @@ export const useAppStore = create<AppState>((set) => ({
   vehicles: [],
   orders: [],
   settlements: [],
+  maintenanceRecords: [],
+  insuranceRecords: [],
+  inspectionRecords: [],
   stats: {
     overview: null,
     monthlyData: [],
@@ -126,6 +150,42 @@ export const useAppStore = create<AppState>((set) => ({
     try {
       const data = await api.settlements.list(params)
       set({ settlements: data })
+    } catch (err) {
+      set({ error: (err as Error).message })
+    } finally {
+      set({ loading: false })
+    }
+  },
+
+  fetchMaintenanceRecords: async (params) => {
+    set({ loading: true, error: null })
+    try {
+      const data = await api.maintenance.list(params)
+      set({ maintenanceRecords: data })
+    } catch (err) {
+      set({ error: (err as Error).message })
+    } finally {
+      set({ loading: false })
+    }
+  },
+
+  fetchInsuranceRecords: async (params) => {
+    set({ loading: true, error: null })
+    try {
+      const data = await api.insurance.list(params)
+      set({ insuranceRecords: data })
+    } catch (err) {
+      set({ error: (err as Error).message })
+    } finally {
+      set({ loading: false })
+    }
+  },
+
+  fetchInspectionRecords: async (params) => {
+    set({ loading: true, error: null })
+    try {
+      const data = await api.inspection.list(params)
+      set({ inspectionRecords: data })
     } catch (err) {
       set({ error: (err as Error).message })
     } finally {
@@ -287,6 +347,69 @@ export const useAppStore = create<AppState>((set) => ({
     await api.vehicles.remove(id)
     set((state) => ({
       vehicles: state.vehicles.filter((v) => v.id !== id),
+    }))
+  },
+
+  addMaintenanceRecord: async (data) => {
+    const record = await api.maintenance.create(data)
+    set((state) => ({ maintenanceRecords: [...state.maintenanceRecords, record] }))
+    return record
+  },
+
+  updateMaintenanceRecord: async (id, data) => {
+    const record = await api.maintenance.update(id, data)
+    set((state) => ({
+      maintenanceRecords: state.maintenanceRecords.map((r) => (r.id === id ? record : r)),
+    }))
+    return record
+  },
+
+  deleteMaintenanceRecord: async (id) => {
+    await api.maintenance.remove(id)
+    set((state) => ({
+      maintenanceRecords: state.maintenanceRecords.filter((r) => r.id !== id),
+    }))
+  },
+
+  addInsuranceRecord: async (data) => {
+    const record = await api.insurance.create(data)
+    set((state) => ({ insuranceRecords: [...state.insuranceRecords, record] }))
+    return record
+  },
+
+  updateInsuranceRecord: async (id, data) => {
+    const record = await api.insurance.update(id, data)
+    set((state) => ({
+      insuranceRecords: state.insuranceRecords.map((r) => (r.id === id ? record : r)),
+    }))
+    return record
+  },
+
+  deleteInsuranceRecord: async (id) => {
+    await api.insurance.remove(id)
+    set((state) => ({
+      insuranceRecords: state.insuranceRecords.filter((r) => r.id !== id),
+    }))
+  },
+
+  addInspectionRecord: async (data) => {
+    const record = await api.inspection.create(data)
+    set((state) => ({ inspectionRecords: [...state.inspectionRecords, record] }))
+    return record
+  },
+
+  updateInspectionRecord: async (id, data) => {
+    const record = await api.inspection.update(id, data)
+    set((state) => ({
+      inspectionRecords: state.inspectionRecords.map((r) => (r.id === id ? record : r)),
+    }))
+    return record
+  },
+
+  deleteInspectionRecord: async (id) => {
+    await api.inspection.remove(id)
+    set((state) => ({
+      inspectionRecords: state.inspectionRecords.filter((r) => r.id !== id),
     }))
   },
 

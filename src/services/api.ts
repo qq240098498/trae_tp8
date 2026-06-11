@@ -192,4 +192,77 @@ export const api = {
     vehicleTypeDistribution: () =>
       request<import('@/types').VehicleTypeDistribution[]>('/stats/vehicle-type-distribution'),
   },
+
+  maintenance: {
+    list: (params?: { vehicleId?: string | number; keyword?: string }) => {
+      const query = new URLSearchParams()
+      if (params?.vehicleId) query.set('vehicleId', String(params.vehicleId))
+      if (params?.keyword) query.set('keyword', params.keyword)
+      return request<import('@/types').MaintenanceRecord[]>(`/maintenance?${query.toString()}`)
+    },
+    get: (id: number) => request<import('@/types').MaintenanceRecord>(`/maintenance/${id}`),
+    create: (data: Partial<import('@/types').MaintenanceRecord>) =>
+      request<import('@/types').MaintenanceRecord>('/maintenance', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    update: (id: number, data: Partial<import('@/types').MaintenanceRecord>) =>
+      request<import('@/types').MaintenanceRecord>(`/maintenance/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      }),
+    remove: (id: number) =>
+      request<{ message: string }>(`/maintenance/${id}`, {
+        method: 'DELETE',
+      }),
+  },
+
+  insurance: {
+    list: (params?: { vehicleId?: string | number; keyword?: string }) => {
+      const query = new URLSearchParams()
+      if (params?.vehicleId) query.set('vehicleId', String(params.vehicleId))
+      if (params?.keyword) query.set('keyword', params.keyword)
+      return request<import('@/types').InsuranceRecord[]>(`/insurance?${query.toString()}`)
+    },
+    get: (id: number) => request<import('@/types').InsuranceRecord>(`/insurance/${id}`),
+    create: (data: Partial<import('@/types').InsuranceRecord>) =>
+      request<import('@/types').InsuranceRecord>('/insurance', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    update: (id: number, data: Partial<import('@/types').InsuranceRecord>) =>
+      request<import('@/types').InsuranceRecord>(`/insurance/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      }),
+    remove: (id: number) =>
+      request<{ message: string }>(`/insurance/${id}`, {
+        method: 'DELETE',
+      }),
+  },
+
+  inspection: {
+    list: (params?: { vehicleId?: string | number; keyword?: string; result?: string }) => {
+      const query = new URLSearchParams()
+      if (params?.vehicleId) query.set('vehicleId', String(params.vehicleId))
+      if (params?.keyword) query.set('keyword', params.keyword)
+      if (params?.result) query.set('result', params.result)
+      return request<import('@/types').InspectionRecord[]>(`/inspection?${query.toString()}`)
+    },
+    get: (id: number) => request<import('@/types').InspectionRecord>(`/inspection/${id}`),
+    create: (data: Partial<import('@/types').InspectionRecord>) =>
+      request<import('@/types').InspectionRecord>('/inspection', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    update: (id: number, data: Partial<import('@/types').InspectionRecord>) =>
+      request<import('@/types').InspectionRecord>(`/inspection/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      }),
+    remove: (id: number) =>
+      request<{ message: string }>(`/inspection/${id}`, {
+        method: 'DELETE',
+      }),
+  },
 }
